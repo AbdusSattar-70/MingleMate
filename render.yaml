@@ -1,6 +1,6 @@
 databases:
   - name: mingle
-    databaseName: collection
+    databaseName: mingle
     user: sattar
     plan: free
 
@@ -15,7 +15,7 @@ services:
     envVars:
       - key: DATABASE_URL
         fromDatabase:
-          name: collection
+          name: mingle_2p1v
           property: connectionString
       - key: RAILS_MASTER_KEY
         sync: false
