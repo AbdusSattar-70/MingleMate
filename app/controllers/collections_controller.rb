@@ -24,7 +24,6 @@ class CollectionsController < ApplicationController
     end
   end
 
-
   # PATCH/PUT /collections/1
   def update
     create_or_delete_collection_category(@collection, params[:collection][:categories])
@@ -48,16 +47,17 @@ class CollectionsController < ApplicationController
     @collection = Collection.find(params[:id])
   end
 
-     def create_or_delete_collection_category(collection,categories)
-        collection.categorizables.destroy_all
-        categories = categories.strip.split(',')
-        categories.each do |category|
-           collection.categories << Category.find_or_create_by(name: category)
-         end
-     end
+  def create_or_delete_collection_category(collection, categories)
+    collection.categorizables.destroy_all
+    categories = categories.strip.split(',')
 
-  def collection_params
-    params.require(:collection).permit(:title, :description, :image, :user_id, :categories, custom_fields: [:field_name, :field_type])
+    categories.each do |category|
+      collection.categories << Category.find_or_create_by(name: category)
+    end
   end
 
+  def collection_params
+    params.require(:collection).permit(:title, :description, :image, :user_id, :categories,
+                                       custom_fields: %i[field_name field_type])
+  end
 end

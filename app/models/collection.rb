@@ -5,6 +5,4 @@ class Collection < ApplicationRecord
   has_many :categories, through: :categorizables
 
   has_many :items, dependent: :destroy
-
 end
-
