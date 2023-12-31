@@ -1,6 +1,6 @@
 Rails.application.routes.draw do
   defaults format: :json do
-  resources :custom_fields
+  resources :items
   resources :categories
   resources :tags
   resources :likes

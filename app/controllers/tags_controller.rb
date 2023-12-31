@@ -35,7 +35,7 @@ class TagsController < ApplicationController
   # DELETE /tags/1
   def destroy
     @tag.destroy!
-    render json: { message: "Tag deleted successfully" }
+    render json: { message: 'Tag deleted successfully' }
   end
 
   private
