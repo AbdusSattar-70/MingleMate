@@ -88,7 +88,7 @@ ActiveRecord::Schema[7.1].define(version: 2023_12_30_192811) do
   create_table "users", force: :cascade do |t|
     t.string "user_name"
     t.string "email"
-    t.string "password"
+    t.string "password_digest"
     t.string "avatar"
     t.integer "role"
     t.boolean "blocked"
