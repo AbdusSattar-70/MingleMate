@@ -1,8 +1,8 @@
 Rails.application.routes.draw do
   defaults format: :json do
   devise_for :users, path: '', path_names: {
-    sign_in: 'login',
-    sign_out: 'logout',
+    sign_in: 'signin',
+    sign_out: 'signout',
     registration: 'signup'
   },
   controllers: {
@@ -11,7 +11,7 @@ Rails.application.routes.draw do
   }
 
   get '/current_user', to: 'current_user#index'
-  resources :users
+  resources :users,  only: [:index, :show, :update, :destroy]
   resources :items
   resources :categories
   resources :tags
