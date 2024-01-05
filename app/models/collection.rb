@@ -1,6 +1,6 @@
 # app/models/collection.rb
 class Collection < ApplicationRecord
-  belongs_to :user
+  belongs_to :user, dependent: :destroy
   has_many :categorizables, dependent: :destroy
   has_many :categories, through: :categorizables
 

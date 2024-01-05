@@ -2,14 +2,26 @@ class CollectionsController < ApplicationController
   before_action :set_collection, only: %i[show update destroy]
 
   # GET /collections
-  def index
-    @collections = Collection.all
-    render json: @collections
+   def index
+    @collections = Collection.all.includes(:user)
+    render json: serialize_collections(@collections)
   end
+
+   # GET /collections/top_five
+  def top_five
+    @collections = Collection
+                      .joins(:items)
+                      .group('collections.id')
+                      .order('COUNT(items.id) DESC')
+                      .limit(5)
+                      .includes(:user)
+     render json: serialize_collections(@collections)
+  end
+
 
   # GET /collections/1
   def show
-    render json: @collection
+     render json:serialize_collections([@collection]).first
   end
 
   # POST /collections
@@ -20,7 +32,7 @@ class CollectionsController < ApplicationController
     if @collection.save
       render json: @collection, status: :created
     else
-      render json: { errors: @collection.errors }, status: :unprocessable_entity
+      render json: {message: @collection.errors.full_messages.to_sentence}, status: :unprocessable_entity
     end
   end
 
@@ -58,6 +70,27 @@ class CollectionsController < ApplicationController
 
   def collection_params
     params.require(:collection).permit(:title, :description, :image, :user_id, :categories,
-                                       custom_fields: %i[field_name field_type])
+                                       custom_fields: %i[id field_name field_type])
   end
+
+
+
+   def serialize_collections(collections)
+    collections.map do |collection|
+      serialize_collection(collection)
+    end
+  end
+
+  def serialize_collection(collection)
+    {
+      id: collection.id,
+      title: collection.title,
+      description: collection.description,
+      image: collection.image,
+      custom_fields: collection.custom_fields,
+      user_name: collection.user.user_name,
+      items_count: collection.items.count,
+    }
+  end
+
 end
