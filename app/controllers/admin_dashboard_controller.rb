@@ -7,7 +7,7 @@ class AdminDashboardController < ApplicationController
     render json: @users
   end
 
- def block_multiple
+  def block_multiple
     handle_multiple_action(true, 'Blocked succeeded', 'Failed to block')
   end
 
@@ -19,16 +19,16 @@ class AdminDashboardController < ApplicationController
     handle_multiple_action(nil, 'Delete succeeded', 'Failed to delete')
   end
 
-def toggle_role
-  user_emails = params[:user_emails]
-  users = User.where(email: user_emails)
+  def toggle_role
+    user_emails = params[:user_emails]
+    users = User.where(email: user_emails)
 
-  users.each do |user|
-    user.update(role: toggle_role_value(user.role))
+    users.each do |user|
+      user.update(role: toggle_role_value(user.role))
+    end
+
+    render json: { message: 'Role toggled successfully' }, status: :ok
   end
-
-  render json: { message: 'Role toggled successfully' }, status: :ok
-end
 
   private
 
@@ -48,7 +48,7 @@ end
     user_emails = params[:user_emails]
     users = User.where(email: user_emails)
 
-    if blocked.nil? ? users.destroy_all : users.update_all(blocked: blocked)
+    if blocked.nil? ? users.destroy_all : users.update_all(blocked:)
       render json: { message: success_message }, status: :ok
     else
       render json: { message: failure_message }, status: :unprocessable_entity
@@ -58,7 +58,6 @@ end
   def toggle_role_value(current_role)
     current_role == 1 ? 2 : 1
   end
-
 
   def user_params
     params.require(:user).permit(:email, :role, :blocked, user_emails: [])

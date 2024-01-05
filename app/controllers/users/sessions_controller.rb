@@ -6,8 +6,8 @@ class Users::SessionsController < Devise::SessionsController
     @user = authenticate_user
 
     if @user
-        sign_in(:user, @user)
-        render json: { message: 'Successfully Signed In', data: serialized_user_attributes(@user) }
+      sign_in(:user, @user)
+      render json: { message: 'Successfully Signed In', data: serialized_user_attributes(@user) }
     else
       render_unauthorized
     end
@@ -17,12 +17,12 @@ class Users::SessionsController < Devise::SessionsController
 
   def respond_to_on_destroy
     decode_jwt
-  if current_user
-    sign_out(current_user)
-    render json: { message: 'User Signed Out Successfully!' }, status: :ok
-  else
-    render_unauthorized
-  end
+    if current_user
+      sign_out(current_user)
+      render json: { message: 'User Signed Out Successfully!' }, status: :ok
+    else
+      render_unauthorized
+    end
   end
 
   def authenticate_user
@@ -33,16 +33,17 @@ class Users::SessionsController < Devise::SessionsController
     render json: { message: 'Unauthorized' }, status: :unauthorized
   end
 
- def decode_jwt
-  if request.headers['Authorization'].present?
+  def decode_jwt
+    return unless request.headers['Authorization'].present?
+
     begin
-      jwt_payload = JWT.decode(request.headers['Authorization']&.split(' ')&.last, Rails.application.credentials.devise_jwt_secret_key!)&.first
-      current_user = User.find(jwt_payload['sub'])
+      jwt_payload = JWT.decode(request.headers['Authorization']&.split()&.last,
+                               Rails.application.credentials.devise_jwt_secret_key!)&.first
+      User.find(jwt_payload['sub'])
     rescue StandardError
-      return
+      nil
     end
   end
-end
 
   def serialized_user_attributes(resource)
     UserSerializer.new(resource).serializable_hash[:data][:attributes]
