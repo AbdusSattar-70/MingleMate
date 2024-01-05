@@ -6,6 +6,10 @@ class Users::RegistrationsController < Devise::RegistrationsController
 
   def respond_with(current_user, _opts = {})
     if resource.persisted?
+      # Check if this is the first user provide admin privilege
+      if User.count == 1
+        current_user.update(role: 2)
+      end
       render json: { message: 'Signed up successfully.' }, status: :ok
     else
       render json: { message: "Registration failed. #{current_user.errors.full_messages.to_sentence}" },
