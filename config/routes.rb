@@ -8,6 +8,8 @@ Rails.application.routes.draw do
   resources :likes
   resources :comments
   resources :collections
+  get 'collection/custom_fields/:id', to: 'collections#get_collection_custom_fields'
+  get 'collection_items/:collection_id', to: 'items#collection_items'
 
   devise_for :users, path: '', path_names: {
     sign_in: 'signin',
