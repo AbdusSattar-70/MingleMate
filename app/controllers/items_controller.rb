@@ -5,7 +5,7 @@ class ItemsController < ApplicationController
     collection_id = params[:collection_id]
 
     if collection_id.present?
-      @items = Item.where(collection_id: collection_id)
+      @items = Item.where(collection_id:)
       render json: serialize_items(@items)
     else
       render json: { error: 'Missing collection_id parameter' }, status: :unprocessable_entity
@@ -69,7 +69,7 @@ class ItemsController < ApplicationController
       tags: item.tags.pluck(:name).flat_map { |tag| tag.split(/\s+/) },
       item_custom_fields: item.custom_fields.map { |field| serialize_custom_field(field) },
       likes: item.likes.count,
-      comments_count:item.comments.count,
+      comments_count: item.comments.count,
       comments: item.comments.map { |comment| serialize_comment(comment) }
     }
   end

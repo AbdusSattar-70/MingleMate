@@ -3,12 +3,12 @@ class CollectionsController < ApplicationController
 
   # GET /collections
   def index
-     @collections = Collection.includes(:user, :categories).all
+    @collections = Collection.includes(:user, :categories).all
     render json: serialize_collections(@collections)
   end
 
   # GET /collections/top_five
-   def top_five
+  def top_five
     @collections = Collection
       .joins(:items)
       .group('collections.id')
@@ -24,8 +24,8 @@ class CollectionsController < ApplicationController
   end
 
   # GET /get_collection_custom_fields/1
-  def get_collection_custom_fields
-  @collection = Collection.find(params[:id])
+  def collection_custom_fields
+    @collection = Collection.find(params[:id])
     render json: serialize_collection_for_item_add(@collection)
   end
 
@@ -35,7 +35,7 @@ class CollectionsController < ApplicationController
     create_or_delete_collection_category(@collection, params[:collection][:categories])
 
     if @collection.save
-      render  status: :created
+      render status: :created
     else
       render json: { message: @collection.errors.full_messages.to_sentence }, status: :unprocessable_entity
     end
@@ -61,9 +61,8 @@ class CollectionsController < ApplicationController
   private
 
   def set_collection
-  @collection = Collection.includes(:user, :categories).find(params[:id])
+    @collection = Collection.includes(:user, :categories).find(params[:id])
   end
-
 
   def create_or_delete_collection_category(collection, categories)
     collection.categorizables.destroy_all
@@ -81,15 +80,15 @@ class CollectionsController < ApplicationController
 
   def serialize_collections(collections)
     collections.map do |collection|
-       {
-      id: collection.id,
-      title: collection.title,
-      description: collection.description,
-      image: collection.image,
-      category:collection.categories.first.name,
-      user_name: collection.user.user_name,
-      items_count: collection.items.count,
-    }
+      {
+        id: collection.id,
+        title: collection.title,
+        description: collection.description,
+        image: collection.image,
+        category: collection.categories.first.name,
+        user_name: collection.user.user_name,
+        items_count: collection.items.count
+      }
     end
   end
 
@@ -99,15 +98,13 @@ class CollectionsController < ApplicationController
       title: collection.title,
       description: collection.description,
       image: collection.image,
-      category:collection.categories.first.name,
+      category: collection.categories.first.name,
       user_name: collection.user.user_name,
-      items_count: collection.items.count,
+      items_count: collection.items.count
     }
   end
 
-
-
-   def serialize_collection_for_item_add(collection)
+  def serialize_collection_for_item_add(collection)
     {
       title: collection.title,
       image: collection.image,
@@ -119,5 +116,4 @@ class CollectionsController < ApplicationController
   def serialize_tags(tags)
     tags.pluck(:name).flat_map { |tag| tag.split(/\s+/) }
   end
-
 end
