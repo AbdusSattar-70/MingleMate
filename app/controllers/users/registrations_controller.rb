@@ -4,20 +4,14 @@ class Users::RegistrationsController < Devise::RegistrationsController
 
   private
 
-  def respond_with(resource, _opts = {})
-    if request.method == 'POST' && resource.persisted?
-      render json: {
-        status: { message: 'Signed up sucessfully.' },
-        data: UserSerializer.new(resource).serializable_hash[:data][:attributes]
-      }, status: :ok
-    elsif request.method == 'DELETE'
-      render json: {
-        status: { message: 'Account deleted successfully.' }
-      }, status: :ok
+  def respond_with(current_user, _opts = {})
+    if resource.persisted?
+      # Check if this is the first user provide admin privilege
+      current_user.update(role: 2) if User.count == 1
+      render json: { message: 'Signed up successfully.' }, status: :ok
     else
-      render json: {
-        status: { message: "User couldn't be created successfully. #{resource.errors.full_messages.to_sentence}" }
-      }, status: :unprocessable_entity
+      render json: { message: "Registration failed. #{current_user.errors.full_messages.to_sentence}" },
+             status: :unprocessable_entity
     end
   end
 end

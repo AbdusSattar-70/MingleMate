@@ -1,11 +1,9 @@
+# for general user purpose
 class UsersController < ApplicationController
   before_action :set_user, only: %i[show update destroy]
+  before_action :authenticate_user!
 
-  def index
-    @users = User.all
-    render json: @users
-  end
-
+  # GET /users/id single user
   def show
     render json: @user
   end
@@ -30,6 +28,6 @@ class UsersController < ApplicationController
   end
 
   def user_params
-    params.require(:user).permit(:user_name, :email, :password, :avatar, :role, :blocked)
+    params.require(:user).permit(:id, :user_name, :email, :avatar)
   end
 end

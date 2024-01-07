@@ -2,26 +2,50 @@ class Users::SessionsController < Devise::SessionsController
   include RackSessionFix
   respond_to :json
 
-  private
+  def create
+    @user = authenticate_user
 
-  def respond_with(resource, _opts = {})
-    render json: {
-      status: { code: 200, message: 'Logged in sucessfully.' },
-      data: UserSerializer.new(resource).serializable_hash[:data][:attributes]
-    }, status: :ok
+    if @user
+      sign_in(:user, @user)
+      render json: { message: 'Successfully Signed In', data: serialized_user_attributes(@user) }
+    else
+      render_unauthorized
+    end
   end
 
+  protected
+
   def respond_to_on_destroy
+    decode_jwt
     if current_user
-      render json: {
-        status: 200,
-        message: 'logged out successfully'
-      }, status: :ok
+      sign_out(current_user)
+      render json: { message: 'User Signed Out Successfully!' }, status: :ok
     else
-      render json: {
-        status: 401,
-        message: "Couldn't find an active session."
-      }, status: :unauthorized
+      render_unauthorized
     end
+  end
+
+  def authenticate_user
+    User.find_for_database_authentication(email: sign_in_params[:email])
+  end
+
+  def render_unauthorized
+    render json: { message: 'Unauthorized' }, status: :unauthorized
+  end
+
+  def decode_jwt
+    return unless request.headers['Authorization'].present?
+
+    begin
+      jwt_payload = JWT.decode(request.headers['Authorization']&.split()&.last,
+                               Rails.application.credentials.devise_jwt_secret_key!)&.first
+      User.find(jwt_payload['sub'])
+    rescue StandardError
+      nil
+    end
+  end
+
+  def serialized_user_attributes(resource)
+    UserSerializer.new(resource).serializable_hash[:data][:attributes]
   end
 end
