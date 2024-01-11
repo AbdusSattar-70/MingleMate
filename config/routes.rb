@@ -1,15 +1,17 @@
 Rails.application.routes.draw do
   defaults format: :json do
 
-  resources :users,  only: [ :show, :update, :destroy]
+  resources :users,  only: [ :show,:update, :destroy]
   resources :items
   resources :categories
   resources :tags
   resources :likes
   resources :comments
   resources :collections
+  get 'user_collections/:id', to: 'collections#user_collections'
   get 'collection/custom_fields/:id', to: 'collections#collection_custom_fields'
   get 'collection_items/:collection_id', to: 'items#collection_items'
+  get 'user_items/:user_id', to: 'items#user_items'
 
   devise_for :users, path: '', path_names: {
     sign_in: 'signin',

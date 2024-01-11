@@ -14,7 +14,7 @@ class CommentsController < ApplicationController
     @comment = Comment.new(comment_params)
 
     if @comment.save
-      render :show, status: :created, location: @comment
+      render json: serialize_comment(@comment), status: :created
     else
       render json: @comment.errors, status: :unprocessable_entity
     end
@@ -23,7 +23,7 @@ class CommentsController < ApplicationController
   # PATCH/PUT /comments/1
   def update
     if @comment.update(comment_params)
-      render :show, status: :ok, location: @comment
+      render :json, status: :ok, location: @comment
     else
       render json: @comment.errors, status: :unprocessable_entity
     end
@@ -35,6 +35,18 @@ class CommentsController < ApplicationController
   end
 
   private
+
+  def serialize_comment(comment)
+    {
+      comment_id: comment.id,
+      content: comment.content,
+      commenter_name: comment.user&.user_name,
+      commenter_avatar: comment.user&.avatar,
+      commenter_id:comment.user_id,
+      created_at:comment.created_at,
+      updated_at:comment.updated_at
+    }
+  end
 
   def set_comment
     @comment = Comment.find(params[:id])
