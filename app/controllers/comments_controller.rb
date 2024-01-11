@@ -42,9 +42,9 @@ class CommentsController < ApplicationController
       content: comment.content,
       commenter_name: comment.user&.user_name,
       commenter_avatar: comment.user&.avatar,
-      commenter_id:comment.user_id,
-      created_at:comment.created_at,
-      updated_at:comment.updated_at
+      commenter_id: comment.user_id,
+      created_at: comment.created_at,
+      updated_at: comment.updated_at
     }
   end
 

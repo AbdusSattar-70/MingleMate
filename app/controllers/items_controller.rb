@@ -12,7 +12,6 @@ class ItemsController < ApplicationController
     end
   end
 
-
   def user_items
     user_id = params[:user_id]
 
@@ -81,7 +80,7 @@ class ItemsController < ApplicationController
       item_author: item.user&.user_name,
       tags: item.tags.pluck(:name).flat_map { |tag| tag.split(/\s+/) },
       item_custom_fields: item.custom_fields.map { |field| serialize_custom_field(field) },
-      likes: item.likes.map {|like| serialize_like(like)},
+      likes: item.likes.map { |like| serialize_like(like) },
       comments: item.comments.map { |comment| serialize_comment(comment) }
     }
   end
@@ -101,19 +100,19 @@ class ItemsController < ApplicationController
       content: comment.content,
       commenter_name: comment.user&.user_name,
       commenter_avatar: comment.user&.avatar,
-      commenter_id:comment.user_id,
-      created_at:comment.created_at,
-      updated_at:comment.updated_at
+      commenter_id: comment.user_id,
+      created_at: comment.created_at,
+      updated_at: comment.updated_at
     }
   end
 
   def serialize_like(like)
-  {
-    id: like.id,
-    user_id: like.user_id,
-    user_photo: like.user&.avatar
-  }
-end
+    {
+      id: like.id,
+      user_id: like.user_id,
+      user_photo: like.user&.avatar
+    }
+  end
 
   def item_params
     params.require(:item).permit(

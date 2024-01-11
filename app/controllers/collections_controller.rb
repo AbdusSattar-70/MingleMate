@@ -18,7 +18,6 @@ class CollectionsController < ApplicationController
     render json: serialize_collections(@collections)
   end
 
-
   # GET /collections/:id/user_collections
   def user_collections
     user = User.find(params[:id])
