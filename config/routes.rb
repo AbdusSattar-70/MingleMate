@@ -8,6 +8,7 @@ Rails.application.routes.draw do
   resources :likes
   resources :comments
   resources :collections
+  get 'tag_related_items', to: 'tags#tag_related_items'
   get 'user_collections/:id', to: 'collections#user_collections'
   get 'collection/custom_fields/:id', to: 'collections#collection_custom_fields'
   get 'collection_items/:collection_id', to: 'items#collection_items'
