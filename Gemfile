@@ -4,6 +4,7 @@ gem 'bootsnap', require: false
 gem 'cancancan', '~> 3.5'
 gem 'devise'
 gem 'devise-jwt'
+gem 'faker'
 gem 'jsonapi-serializer'
 gem 'pg', '~> 1.1'
 gem 'puma', '>= 5.0'

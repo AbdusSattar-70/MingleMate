@@ -1,6 +1,18 @@
 class ItemsController < ApplicationController
   before_action :set_item, only: %i[show update destroy]
 
+  def index
+    page = params.fetch(:page, 1).to_i
+    per_page = params.fetch(:per_page, 5).to_i
+
+    @items = Item.includes(:collection, :user, :tags, :likes, :comments)
+      .order(created_at: :desc)
+      .limit(per_page)
+      .offset((page - 1) * per_page)
+
+    render json: serialize_items(@items)
+  end
+
   def collection_items
     collection_id = params[:collection_id]
 
