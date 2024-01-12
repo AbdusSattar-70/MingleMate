@@ -7,6 +7,19 @@ class TagsController < ApplicationController
     render json: @tags
   end
 
+  def tag_related_items
+    if params[:search].present?
+      search_term = params[:search].downcase
+      @tags = Tag.where('LOWER(name) LIKE ?', "%#{search_term}%")
+
+      @related_items = @tags.flat_map(&:items)
+    else
+      @related_items = Item.all
+    end
+
+    render json: serialize_items(@related_items)
+  end
+
   # GET /tags/1
   def show
     render json: @tag
@@ -42,6 +55,23 @@ class TagsController < ApplicationController
 
   def set_tag
     @tag = Tag.find(params[:id])
+  end
+
+  def serialize_items(items)
+    items.map { |item| serialize_item(item) }
+  end
+
+  def serialize_item(item)
+    {
+      item_id: item.id,
+      item_name: item.item_name,
+      collection_name: item.collection&.title,
+      item_author: item.user&.user_name,
+      likes: item.likes.count,
+      comments: item.comments.count,
+      created_at: item.created_at,
+      updated_at: item.updated_at
+    }
   end
 
   def tag_params

@@ -1,6 +1,18 @@
 class ItemsController < ApplicationController
   before_action :set_item, only: %i[show update destroy]
 
+  def index
+    page = params.fetch(:page, 1).to_i
+    per_page = params.fetch(:per_page, 5).to_i
+
+    @items = Item.includes(:collection, :user, :tags, :likes, :comments)
+      .order(created_at: :desc)
+      .limit(per_page)
+      .offset((page - 1) * per_page)
+
+    render json: serialize_items(@items)
+  end
+
   def collection_items
     collection_id = params[:collection_id]
 
@@ -9,6 +21,17 @@ class ItemsController < ApplicationController
       render json: serialize_items(@items)
     else
       render json: { error: 'Missing collection_id parameter' }, status: :unprocessable_entity
+    end
+  end
+
+  def user_items
+    user_id = params[:user_id]
+
+    if user_id.present?
+      @items = Item.where(user_id:)
+      render json: serialize_items(@items)
+    else
+      render json: { error: 'Missing user_id parameter' }, status: :unprocessable_entity
     end
   end
 
@@ -63,13 +86,13 @@ class ItemsController < ApplicationController
 
   def serialize_item(item)
     {
-      id: item.id,
+      item_id: item.id,
       item_name: item.item_name,
+      collection_name: item.collection&.title,
       item_author: item.user&.user_name,
       tags: item.tags.pluck(:name).flat_map { |tag| tag.split(/\s+/) },
       item_custom_fields: item.custom_fields.map { |field| serialize_custom_field(field) },
-      likes: item.likes.count,
-      comments_count: item.comments.count,
+      likes: item.likes.map { |like| serialize_like(like) },
       comments: item.comments.map { |comment| serialize_comment(comment) }
     }
   end
@@ -85,9 +108,21 @@ class ItemsController < ApplicationController
 
   def serialize_comment(comment)
     {
-      id: comment.id,
+      comment_id: comment.id,
       content: comment.content,
-      user_name: comment.user&.user_name
+      commenter_name: comment.user&.user_name,
+      commenter_avatar: comment.user&.avatar,
+      commenter_id: comment.user_id,
+      created_at: comment.created_at,
+      updated_at: comment.updated_at
+    }
+  end
+
+  def serialize_like(like)
+    {
+      id: like.id,
+      user_id: like.user_id,
+      user_photo: like.user&.avatar
     }
   end
 

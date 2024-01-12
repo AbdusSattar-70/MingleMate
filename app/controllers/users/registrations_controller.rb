@@ -8,10 +8,14 @@ class Users::RegistrationsController < Devise::RegistrationsController
     if resource.persisted?
       # Check if this is the first user provide admin privilege
       current_user.update(role: 2) if User.count == 1
-      render json: { message: 'Signed up successfully.' }, status: :ok
+      render json: { message: 'Registration succeed', data: serialized_user_attributes(current_user) }
     else
       render json: { message: "Registration failed. #{current_user.errors.full_messages.to_sentence}" },
              status: :unprocessable_entity
     end
+  end
+
+  def serialized_user_attributes(resource)
+    UserSerializer.new(resource).serializable_hash[:data][:attributes]
   end
 end

@@ -6,8 +6,12 @@ class Users::SessionsController < Devise::SessionsController
     @user = authenticate_user
 
     if @user
-      sign_in(:user, @user)
-      render json: { message: 'Successfully Signed In', data: serialized_user_attributes(@user) }
+      if @user.blocked == true
+        render json: { message: 'Oops! You were blocked by admin' }, status: :unauthorized
+      else
+        sign_in(:user, @user)
+        render json: { message: 'Successfully Signed In', data: serialized_user_attributes(@user) }, status: :ok
+      end
     else
       render_unauthorized
     end

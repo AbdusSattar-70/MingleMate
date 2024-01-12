@@ -3,18 +3,27 @@ class CollectionsController < ApplicationController
 
   # GET /collections
   def index
-    @collections = Collection.includes(:user, :categories).all
+    page = params.fetch(:page, 1).to_i
+    per_page = params.fetch(:per_page, 5).to_i
+
+    @collections = Collection
+      .includes(:user, :categories)
+      .limit(per_page)
+      .offset((page - 1) * per_page)
+
     render json: serialize_collections(@collections)
   end
 
   # GET /collections/top_five
-  def top_five
-    @collections = Collection
-      .joins(:items)
-      .group('collections.id')
-      .order('COUNT(items.id) DESC')
-      .limit(5)
-      .includes(:user, :categories, :items)
+  def top_five_collections
+    @collections = fetch_top_collections
+    render json: serialize_collections(@collections)
+  end
+
+  # GET /collections/:id/user_collections
+  def user_collections
+    user = User.find(params[:id])
+    @collections = user.collections.includes(:user, :categories, :items)
     render json: serialize_collections(@collections)
   end
 
@@ -115,5 +124,32 @@ class CollectionsController < ApplicationController
 
   def serialize_tags(tags)
     tags.pluck(:name).flat_map { |tag| tag.split(/\s+/) }
+  end
+
+  def fetch_top_collections
+    collections = fetch_initial_collections
+    fetch_additional_collections(collections)
+  end
+
+  def fetch_initial_collections
+    Collection
+      .joins(:items, :user, :categories)
+      .group('collections.id, users.id, categories.id, items.id')
+      .order('COUNT(items.id) DESC')
+      .limit(5)
+      .includes(:user, :categories, :items)
+      .to_a
+  end
+
+  def fetch_additional_collections(existing_collections)
+    while existing_collections.length < 5
+      additional_collections = Collection
+        .includes(:user, :categories, :items)
+        .limit(5 - existing_collections.length).to_a
+      break if additional_collections.empty?
+
+      existing_collections.concat(additional_collections)
+    end
+    existing_collections
   end
 end
