@@ -7,4 +7,5 @@ class Item < ApplicationRecord
   has_many :comments
 
   validates :item_name, presence: true
+  validates :tags, presence: true
 end

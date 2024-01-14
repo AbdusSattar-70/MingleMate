@@ -89,6 +89,7 @@ class ItemsController < ApplicationController
       item_id: item.id,
       item_name: item.item_name,
       collection_name: item.collection&.title,
+      collection_id: item.collection.id,
       item_author: item.user&.user_name,
       tags: item.tags.pluck(:name).flat_map { |tag| tag.split(/\s+/) },
       item_custom_fields: item.custom_fields.map { |field| serialize_custom_field(field) },
@@ -122,6 +123,7 @@ class ItemsController < ApplicationController
     {
       id: like.id,
       user_id: like.user_id,
+      user_name: like.user&.user_name,
       user_photo: like.user&.avatar
     }
   end

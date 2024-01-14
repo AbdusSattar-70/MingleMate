@@ -5,7 +5,7 @@ class Users::SessionsController < Devise::SessionsController
   def create
     @user = authenticate_user
 
-    if @user
+    if @user && @user.valid_password?(sign_in_params[:password])
       if @user.blocked == true
         render json: { message: 'Oops! You were blocked by admin' }, status: :unauthorized
       else
@@ -23,7 +23,7 @@ class Users::SessionsController < Devise::SessionsController
     decode_jwt
     if current_user
       sign_out(current_user)
-      render json: { message: 'User Signed Out Successfully!' }, status: :ok
+      render json: { message: 'Signed Out Successfully!' }, status: :ok
     else
       render_unauthorized
     end

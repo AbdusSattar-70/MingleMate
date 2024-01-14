@@ -94,7 +94,7 @@ class CollectionsController < ApplicationController
         title: collection.title,
         description: collection.description,
         image: collection.image,
-        category: collection.categories.first.name,
+        category: collection.categories.first&.name,
         user_name: collection.user.user_name,
         items_count: collection.items.count
       }
@@ -107,7 +107,7 @@ class CollectionsController < ApplicationController
       title: collection.title,
       description: collection.description,
       image: collection.image,
-      category: collection.categories.first.name,
+      category: collection.categories.first&.name,
       user_name: collection.user.user_name,
       items_count: collection.items.count
     }
