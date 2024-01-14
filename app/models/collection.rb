@@ -8,5 +8,4 @@ class Collection < ApplicationRecord
   validates :title, presence: true
   validates :description, presence: true
   validates :categories, presence: true
-
 end

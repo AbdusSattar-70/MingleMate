@@ -2,26 +2,26 @@ class LikesController < ApplicationController
   # GET /item_likes_count/:item_id
   def item_likes_count
     item_id = params[:item_id]
-    @likes = Like.where(item_id: item_id)
+    @likes = Like.where(item_id:)
     render json: serialize_likes(@likes)
   end
 
   # POST /likes
-def create
-  existing_like = Like.find_by(user_id: like_params[:user_id], item_id: like_params[:item_id])
+  def create
+    existing_like = Like.find_by(user_id: like_params[:user_id], item_id: like_params[:item_id])
 
-  if existing_like
-    render json: { message: 'You have already liked this item' }, status: :unprocessable_entity
-  else
-    @like = Like.new(like_params)
-
-    if @like.save
-      render json: @like, status: :created, location: @like
+    if existing_like
+      render json: { message: 'You have already liked this item' }, status: :unprocessable_entity
     else
-      render json: @like.errors, status: :unprocessable_entity
+      @like = Like.new(like_params)
+
+      if @like.save
+        render json: @like, status: :created, location: @like
+      else
+        render json: @like.errors, status: :unprocessable_entity
+      end
     end
   end
-end
 
 
   private
@@ -31,7 +31,7 @@ end
   end
 
   def serialize_likes(likes)
-     likes.map { |like| serialize_like(like) }
+    likes.map { |like| serialize_like(like) }
   end
 
   def serialize_like(like)
@@ -42,5 +42,4 @@ end
       user_photo: like.user&.avatar
     }
   end
-
 end
