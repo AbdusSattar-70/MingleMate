@@ -23,7 +23,6 @@ class LikesController < ApplicationController
     end
   end
 
-
   private
 
   def like_params

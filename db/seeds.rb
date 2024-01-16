@@ -60,14 +60,22 @@ CATEGORIES = [
       ]
     )
 
-    # Create items for each collection
-    5.times do
-      Item.create(
-        item_name: Faker::Lorem.words(number: 2).join(" "),
-        collection_id: collection.id,
-        user_id: user.id,
-        tags:  Faker::Lorem.words(number: 3).join(" ")
-      )
-    end
+   # Create items for the collection
+5.times do
+  item_name = Faker::Lorem.words(number: 2).join(" ")
+  tags = Faker::Lorem.words(number: 3).join(",")
+
+  item = Item.create(
+    item_name: item_name,
+    collection_id: collection.id,
+    user_id: user.id,
+  )
+
+  # Create or delete item tags
+  item.taggables.destroy_all
+  tags.split(',').each do |tag|
+    item.tags << Tag.find_or_create_by(name: tag.strip)
+  end
+end
   end
 end
