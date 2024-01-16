@@ -1,6 +1,6 @@
 databases:
   - name: mingle
-    databaseName: mingle
+    databaseName: mingle_hvmn
     user: sattar
     plan: free
 
@@ -9,12 +9,12 @@ services:
     name: mingle
     runtime: ruby
     plan: free
-    buildCommand: "bundle install rails rails db:drop db:create rails db:migrate"
+    buildCommand: "bundle install rails rails db:create rails db:migrate"
     startCommand: "bundle exec puma -C config/puma.rb"
      envVars:
       - key: DATABASE_URL
         fromDatabase:
-          name: sattardb
+          name: mingle_hvmn
           property: connectionString
       - key: RAILS_MASTER_KEY
         sync: false

@@ -15,6 +15,6 @@ test:
 
 production:
   <<: *default
-  database: mingle_mate_api_production
-  username: mingle_mate_api
+  database: mingle_hvmn
+  username: sattar
   password: <%= ENV["DATABASE_URL"] %>
