@@ -68,7 +68,6 @@ CATEGORIES = [
     item_name: item_name,
     collection_id: collection.id,
     user_id: user.id,
-    tags: 'tags-1 tag-2 tag-3',
   )
 
 end
