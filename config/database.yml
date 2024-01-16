@@ -17,4 +17,4 @@ production:
   <<: *default
   database: mingle_mate_api_production
   username: mingle_mate_api
-  password: <%= ENV["MINGLE_MATE_API_DATABASE_PASSWORD"] %>
+  password: <%= ENV["DATABASE_URL"] %>
