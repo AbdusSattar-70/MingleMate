@@ -63,7 +63,7 @@ CATEGORIES = [
     # Create items for each collection
     5.times do
       item_name = Faker::Lorem.words(number: 2).join(" ")
-      tags = Faker::Lorem.words(number: 3).join(" ")
+      tags = Faker::Lorem.words(number: 1)
 
       Item.create(
         item_name: item_name,
