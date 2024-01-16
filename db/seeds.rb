@@ -59,5 +59,18 @@ CATEGORIES = [
         { id: "10", field_name: "Field 10", field_type: %w[number boolean date string text].sample },
       ]
     )
+
+    # Create items for each collection
+    5.times do
+      item_name = Faker::Lorem.words(number: 2).join(" ")
+      tags = Faker::Lorem.words(number: 3).join(",")
+
+      Item.create(
+        item_name: item_name,
+        collection_id: collection.id,
+        user_id: user.id,
+        tags: tags
+      )
+    end
   end
 end
