@@ -25,15 +25,23 @@ class ItemsController < ApplicationController
   end
 
   def user_items
-    user_id = params[:user_id]
+  page = params.fetch(:page, 1).to_i
+  per_page = params.fetch(:per_page, 5).to_i
+  user_id = params[:user_id]
 
-    if user_id.present?
-      @items = Item.where(user_id:)
-      render json: serialize_items(@items)
-    else
-      render json: { error: 'Missing user_id parameter' }, status: :unprocessable_entity
-    end
+  if user_id.present?
+    @items = Item.where(user_id: user_id)
+                 .includes(:collection, :user, :tags, :likes, :comments)
+                 .order(created_at: :desc)
+                 .limit(per_page)
+                 .offset((page - 1) * per_page)
+
+    render json: serialize_items(@items)
+  else
+    render json: { error: 'Missing user_id parameter' }, status: :unprocessable_entity
   end
+end
+
 
   def show
     render json: serialize_item(@item)
