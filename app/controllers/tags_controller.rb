@@ -2,9 +2,11 @@ class TagsController < ApplicationController
   before_action :set_tag, only: %i[show update destroy]
 
   # GET /tags
-  def index
-    @tags = Tag.all.pluck(:name).flat_map { |tag| tag.split(/\s+/) }
-    render json: @tags
+   def index
+    all_tags = Tag.all.pluck(:name).flat_map { |tag| tag.split(/\s+/) }
+    unique_tags = all_tags.uniq
+
+    render json: unique_tags
   end
 
   def tag_related_items

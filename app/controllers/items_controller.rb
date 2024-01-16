@@ -62,7 +62,7 @@ class ItemsController < ApplicationController
 
   def destroy
     if @item.destroy
-      render json: { message: 'Collection deleted successfully', item_id: @item.id }, status: :ok
+      render json: { message: 'item deleted successfully', item_id: @item.id }, status: :ok
     else
       render json: { errors: @item.errors.full_messages }, status: :unprocessable_entity
     end
