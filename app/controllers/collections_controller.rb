@@ -23,8 +23,14 @@ class CollectionsController < ApplicationController
 
   # GET /collections/:id/user_collections
   def user_collections
+    page = params.fetch(:page, 1).to_i
+    per_page = params.fetch(:per_page, 5).to_i
     user = User.find(params[:id])
-    @collections = user.collections.includes(:user, :categories, :items)
+
+    @collections = user.collections
+      .includes(:user, :categories, :items).limit(per_page)
+      .offset((page - 1) * per_page)
+
     render json: serialize_collections(@collections)
   end
 
@@ -123,13 +129,8 @@ class CollectionsController < ApplicationController
     {
       title: collection.title,
       image: collection.image,
-      custom_fields: collection.custom_fields,
-      tags: serialize_tags(Tag.all)
+      custom_fields: collection.custom_fields
     }
-  end
-
-  def serialize_tags(tags)
-    tags.pluck(:name).flat_map { |tag| tag.split(/\s+/) }
   end
 
   def fetch_top_collections
