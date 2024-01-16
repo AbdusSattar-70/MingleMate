@@ -9,7 +9,7 @@ services:
     name: mingle
     runtime: ruby
     plan: free
-    buildCommand: "bundle install rails rails db:create rails db:migrate"
+    buildCommand: "bundle install rails db:create rails db:migrate"
     startCommand: "bundle exec puma -C config/puma.rb"
      envVars:
       - key: DATABASE_URL
