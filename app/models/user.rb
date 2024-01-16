@@ -3,6 +3,7 @@ class User < ApplicationRecord
 
   devise :database_authenticatable, :registerable, :validatable,
          :jwt_authenticatable, jwt_revocation_strategy: self
-  has_many :collections
-  has_many :items
+
+  has_many :collections, dependent: :destroy
+  has_many :items, dependent: :destroy
 end

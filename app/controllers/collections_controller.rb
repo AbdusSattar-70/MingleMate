@@ -1,5 +1,6 @@
 class CollectionsController < ApplicationController
   before_action :set_collection, only: %i[show update destroy]
+  before_action :authenticate_user!, only: %i[create update destroy]
 
   # GET /collections
   def index
@@ -55,7 +56,7 @@ class CollectionsController < ApplicationController
     create_or_delete_collection_category(@collection, params[:collection][:categories])
 
     if @collection.update(collection_params.except(:categories))
-      render json: @collection
+      render json: @collection, status: :ok
     else
       render json: @collection.errors, status: :unprocessable_entity
     end
@@ -63,8 +64,11 @@ class CollectionsController < ApplicationController
 
   # DELETE /collections/1
   def destroy
-    @collection.destroy!
-    head :no_content
+    if @collection.destroy
+      render json: { message: 'Collection deleted successfully', data: @collection }, status: :ok
+    else
+      render json: { errors: @collection.errors.full_messages }, status: :unprocessable_entity
+    end
   end
 
   private
@@ -96,6 +100,7 @@ class CollectionsController < ApplicationController
         image: collection.image,
         category: collection.categories.first&.name,
         user_name: collection.user.user_name,
+        author_id: collection.user&.id,
         items_count: collection.items.count
       }
     end
@@ -108,7 +113,8 @@ class CollectionsController < ApplicationController
       description: collection.description,
       image: collection.image,
       category: collection.categories.first&.name,
-      user_name: collection.user.user_name,
+      user_name: collection.user&.user_name,
+      author_id: collection.user&.id,
       items_count: collection.items.count
     }
   end
@@ -127,29 +133,11 @@ class CollectionsController < ApplicationController
   end
 
   def fetch_top_collections
-    collections = fetch_initial_collections
-    fetch_additional_collections(collections)
-  end
-
-  def fetch_initial_collections
     Collection
       .joins(:items, :user, :categories)
       .group('collections.id, users.id, categories.id, items.id')
       .order('COUNT(items.id) DESC')
       .limit(5)
       .includes(:user, :categories, :items)
-      .to_a
-  end
-
-  def fetch_additional_collections(existing_collections)
-    while existing_collections.length < 5
-      additional_collections = Collection
-        .includes(:user, :categories, :items)
-        .limit(5 - existing_collections.length).to_a
-      break if additional_collections.empty?
-
-      existing_collections.concat(additional_collections)
-    end
-    existing_collections
   end
 end
