@@ -7,9 +7,11 @@ class CollectionsController < ApplicationController
     page = params.fetch(:page, 1).to_i
     per_page = params.fetch(:per_page, 5).to_i
 
-    @collections = Collection
-      .includes(:user, :categories)
-      .limit(per_page)
+    @collections = Collection.includes(:user, :categories)
+
+    apply_search_filters(params[:search]) if params[:search].present?
+
+    @collections = @collections.limit(per_page)
       .offset((page - 1) * per_page)
 
     render json: serialize_collections(@collections)
@@ -140,5 +142,12 @@ class CollectionsController < ApplicationController
       .order('COUNT(items.id) DESC')
       .limit(5)
       .includes(:user, :categories, :items)
+  end
+
+  def apply_search_filters(search_param)
+    search_params = search_param.split(',').map(&:strip)
+    @collections = @collections.joins(:user, :categories)
+      .where('collections.title ILIKE ? OR users.user_name ILIKE ? OR categories.name ILIKE ?',
+             Array.new(3, "%#{search_params.first}%"))
   end
 end
