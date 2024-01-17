@@ -145,8 +145,7 @@ class CollectionsController < ApplicationController
   end
 
   def apply_search_filters(search_param)
-    search_params = search_param.split(',').map(&:strip)
-    search_value = "%#{search_params.first}%"
+    search_value = "%#{search_param}%"
     @collections = @collections.joins(:user, :categories)
       .where('collections.title ILIKE ? OR users.user_name ILIKE ? OR categories.name ILIKE ?',
              search_value, search_value, search_value)
