@@ -1,54 +1,18 @@
 class ItemsController < ApplicationController
   before_action :set_item, only: %i[show update destroy]
+  before_action :set_items, only: %i[index collection_items user_items]
 
   def index
-    page = params.fetch(:page, 1).to_i
-    per_page = params.fetch(:per_page, 5).to_i
-
-    @items = Item.includes(:collection, :user, :tags, :likes, :comments)
-      .order(created_at: :desc)
-      .limit(per_page)
-      .offset((page - 1) * per_page)
-
     render json: serialize_items(@items)
   end
 
-   def collection_items
-    collection_id = params[:collection_id]
-    page = params.fetch(:page, 1).to_i
-    per_page = params.fetch(:per_page, 5).to_i
-
-    if collection_id.present?
-      @items = Item.where(collection_id: collection_id)
-                   .includes(:collection, :user, :tags, :likes, :comments)
-                   .order(created_at: :desc)
-                   .limit(per_page)
-                   .offset((page - 1) * per_page)
-
-      render json: serialize_items(@items)
-    else
-      render json: { error: 'Missing collection_id parameter' }, status: :unprocessable_entity
-    end
+  def collection_items
+    render json: serialize_items(@items)
   end
 
   def user_items
-  page = params.fetch(:page, 1).to_i
-  per_page = params.fetch(:per_page, 5).to_i
-  user_id = params[:user_id]
-
-  if user_id.present?
-    @items = Item.where(user_id: user_id)
-                 .includes(:collection, :user, :tags, :likes, :comments)
-                 .order(created_at: :desc)
-                 .limit(per_page)
-                 .offset((page - 1) * per_page)
-
     render json: serialize_items(@items)
-  else
-    render json: { error: 'Missing user_id parameter' }, status: :unprocessable_entity
   end
-end
-
 
   def show
     render json: serialize_item(@item)
@@ -96,6 +60,20 @@ end
 
   def set_item
     @item = Item.find(params[:id])
+  end
+
+  def set_items
+    @items = paginate_items(Item.all)
+  end
+
+  def paginate_items(items)
+    page = params.fetch(:page, 1).to_i
+    per_page = params.fetch(:per_page, 5).to_i
+    items.includes(common_includes).order(created_at: :desc).limit(per_page).offset((page - 1) * per_page)
+  end
+
+  def common_includes
+    %i[collection user tags likes comments]
   end
 
   def serialize_items(items)
