@@ -63,7 +63,18 @@ class ItemsController < ApplicationController
   end
 
   def set_items
-    @items = paginate_items(Item.all)
+    collection_id = params[:collection_id]
+    user_id = params[:user_id]
+
+    if collection_id.present?
+      @items = paginate_items( Item.where(collection_id:))
+
+    elsif user_id.present?
+      @items = paginate_items(Item.where(user_id:))
+
+    else
+      @items = paginate_items(Item.all)
+    end
   end
 
   def paginate_items(items)
