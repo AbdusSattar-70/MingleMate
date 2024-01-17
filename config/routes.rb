@@ -9,6 +9,8 @@ Rails.application.routes.draw do
   resources :likes
   resources :comments
   resources :collections
+
+  get 'search', to: 'items#search'
   get 'tag_related_items', to: 'tags#tag_related_items'
   get 'top_five_collections', to: 'collections#top_five_collections'
   get 'user_collections/:id', to: 'collections#user_collections'
