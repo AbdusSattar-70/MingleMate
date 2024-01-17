@@ -12,10 +12,11 @@ class Item < ApplicationRecord
   validates :tags, presence: true
 
   pg_search_scope :search,
-                  against: [:item_name],
+                  against: %i[item_name custom_fields],
                   associated_against: {
                     user: [:user_name],
-                    collection: %i[title description category],
+                    collection: %i[title description custom_fields],
+                    categories: [:name],
                     tags: [:name],
                     comments: [:content]
                   },

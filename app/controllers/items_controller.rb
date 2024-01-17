@@ -6,7 +6,7 @@ class ItemsController < ApplicationController
     render json: serialize_items(@items)
   end
 
-  def search
+  def full_text_search
     search_param = params[:search]
     @items = Item.search(search_param)
     render json: serialize_items(@items)
