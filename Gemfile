@@ -6,10 +6,12 @@ gem 'devise-jwt'
 gem 'faker'
 gem 'jsonapi-serializer'
 gem 'pg', '~> 1.1'
+gem 'pg_search'
 gem 'puma', '>= 5.0'
 gem 'rack-cors'
 gem 'rails', '~> 7.1.2'
 gem 'tzinfo-data', platforms: %i[windows jruby]
+
 
 group :development, :test do
   gem 'debug', platforms: %i[mri windows]

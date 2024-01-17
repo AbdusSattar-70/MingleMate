@@ -6,6 +6,12 @@ class ItemsController < ApplicationController
     render json: serialize_items(@items)
   end
 
+  def search
+    search_param = params[:search]
+    @items = Item.search(search_param)
+    render json: serialize_items(@items)
+  end
+
   def collection_items
     render json: serialize_items(@items)
   end
@@ -66,15 +72,15 @@ class ItemsController < ApplicationController
     collection_id = params[:collection_id]
     user_id = params[:user_id]
 
-    if collection_id.present?
-      @items = paginate_items( Item.where(collection_id:))
+    @items = if collection_id.present?
+               paginate_items(Item.where(collection_id:))
 
-    elsif user_id.present?
-      @items = paginate_items(Item.where(user_id:))
+             elsif user_id.present?
+               paginate_items(Item.where(user_id:))
 
-    else
-      @items = paginate_items(Item.all)
-    end
+             else
+               paginate_items(Item.all)
+             end
   end
 
   def paginate_items(items)
