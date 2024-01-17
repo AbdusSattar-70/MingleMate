@@ -1,28 +1,18 @@
 class LikesController < ApplicationController
-  before_action :set_like, only: %i[show update destroy]
-
-  # GET /likes
-  def index
-    @likes = Like.all
-    render json: @likes
-  end
-
-  # GET /likes/1
-  def show
-    render json: @like
+  # GET /item_likes_count/:item_id
+  def item_likes_count
+    item_id = params[:item_id]
+    @likes = Like.where(item_id:)
+    render json: serialize_likes(@likes)
   end
 
   # POST /likes
   def create
-    # Check if the user has already liked the item
     existing_like = Like.find_by(user_id: like_params[:user_id], item_id: like_params[:item_id])
 
     if existing_like
-      # User has already liked the item, perform "unlike" action
-      existing_like.destroy!
-      head :no_content
+      render json: { message: 'You have already liked this item' }, status: :unprocessable_entity
     else
-      # User hasn't liked the item, create a new "like"
       @like = Like.new(like_params)
 
       if @like.save
@@ -33,28 +23,22 @@ class LikesController < ApplicationController
     end
   end
 
-  # PATCH/PUT /likes/1
-  def update
-    if @like.update(like_params)
-      render json: @like, status: :ok, location: @like
-    else
-      render json: @like.errors, status: :unprocessable_entity
-    end
-  end
-
-  # DELETE /likes/1
-  def destroy
-    @like.destroy!
-    head :no_content
-  end
-
   private
-
-  def set_like
-    @like = Like.find(params[:id])
-  end
 
   def like_params
     params.require(:like).permit(:user_id, :item_id)
+  end
+
+  def serialize_likes(likes)
+    likes.map { |like| serialize_like(like) }
+  end
+
+  def serialize_like(like)
+    {
+      id: like.id,
+      user_id: like.user_id,
+      user_name: like.user&.user_name,
+      user_photo: like.user&.avatar
+    }
   end
 end

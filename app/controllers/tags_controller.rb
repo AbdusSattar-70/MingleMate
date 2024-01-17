@@ -3,8 +3,10 @@ class TagsController < ApplicationController
 
   # GET /tags
   def index
-    @tags = Tag.all.pluck(:name).flat_map { |tag| tag.split(/\s+/) }
-    render json: @tags
+    all_tags = Tag.all.pluck(:name).flat_map { |tag| tag.split(/\s+/) }
+    unique_tags = all_tags.uniq
+
+    render json: unique_tags
   end
 
   def tag_related_items

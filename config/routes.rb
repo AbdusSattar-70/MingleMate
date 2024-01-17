@@ -15,6 +15,7 @@ Rails.application.routes.draw do
   get 'collection/custom_fields/:id', to: 'collections#collection_custom_fields'
   get 'collection_items/:collection_id', to: 'items#collection_items'
   get 'user_items/:user_id', to: 'items#user_items'
+  get 'item_likes_count/:item_id', to: 'likes#item_likes_count'
 
   devise_for :users, path: '', path_names: {
     sign_in: 'signin',

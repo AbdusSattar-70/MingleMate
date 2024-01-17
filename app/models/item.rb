@@ -3,8 +3,9 @@ class Item < ApplicationRecord
   belongs_to :user
   has_many :taggables, dependent: :destroy
   has_many :tags, through: :taggables
-  has_many :likes
-  has_many :comments
+  has_many :likes, dependent: :destroy
+  has_many :comments, dependent: :destroy
 
   validates :item_name, presence: true
+  validates :tags, presence: true
 end

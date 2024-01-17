@@ -1,7 +1,6 @@
 source 'https://rubygems.org'
 ruby '3.2.2'
 gem 'bootsnap', require: false
-gem 'cancancan', '~> 3.5'
 gem 'devise'
 gem 'devise-jwt'
 gem 'faker'

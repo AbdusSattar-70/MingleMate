@@ -1,14 +1,17 @@
 class CollectionsController < ApplicationController
   before_action :set_collection, only: %i[show update destroy]
+  before_action :authenticate_user!, only: %i[create update destroy]
 
   # GET /collections
   def index
     page = params.fetch(:page, 1).to_i
     per_page = params.fetch(:per_page, 5).to_i
 
-    @collections = Collection
-      .includes(:user, :categories)
-      .limit(per_page)
+    @collections = Collection.includes(:user, :categories)
+
+    apply_search_filters(params[:search]) if params[:search].present?
+
+    @collections = @collections.limit(per_page)
       .offset((page - 1) * per_page)
 
     render json: serialize_collections(@collections)
@@ -22,8 +25,14 @@ class CollectionsController < ApplicationController
 
   # GET /collections/:id/user_collections
   def user_collections
+    page = params.fetch(:page, 1).to_i
+    per_page = params.fetch(:per_page, 5).to_i
     user = User.find(params[:id])
-    @collections = user.collections.includes(:user, :categories, :items)
+
+    @collections = user.collections
+      .includes(:user, :categories, :items).limit(per_page)
+      .offset((page - 1) * per_page)
+
     render json: serialize_collections(@collections)
   end
 
@@ -55,7 +64,7 @@ class CollectionsController < ApplicationController
     create_or_delete_collection_category(@collection, params[:collection][:categories])
 
     if @collection.update(collection_params.except(:categories))
-      render json: @collection
+      render json: @collection, status: :ok
     else
       render json: @collection.errors, status: :unprocessable_entity
     end
@@ -63,8 +72,11 @@ class CollectionsController < ApplicationController
 
   # DELETE /collections/1
   def destroy
-    @collection.destroy!
-    head :no_content
+    if @collection.destroy
+      render json: { message: 'Collection deleted successfully', data: @collection }, status: :ok
+    else
+      render json: { errors: @collection.errors.full_messages }, status: :unprocessable_entity
+    end
   end
 
   private
@@ -94,8 +106,9 @@ class CollectionsController < ApplicationController
         title: collection.title,
         description: collection.description,
         image: collection.image,
-        category: collection.categories.first.name,
+        category: collection.categories.first&.name,
         user_name: collection.user.user_name,
+        author_id: collection.user&.id,
         items_count: collection.items.count
       }
     end
@@ -107,8 +120,9 @@ class CollectionsController < ApplicationController
       title: collection.title,
       description: collection.description,
       image: collection.image,
-      category: collection.categories.first.name,
-      user_name: collection.user.user_name,
+      category: collection.categories.first&.name,
+      user_name: collection.user&.user_name,
+      author_id: collection.user&.id,
       items_count: collection.items.count
     }
   end
@@ -117,39 +131,25 @@ class CollectionsController < ApplicationController
     {
       title: collection.title,
       image: collection.image,
-      custom_fields: collection.custom_fields,
-      tags: serialize_tags(Tag.all)
+      custom_fields: collection.custom_fields
     }
   end
 
-  def serialize_tags(tags)
-    tags.pluck(:name).flat_map { |tag| tag.split(/\s+/) }
-  end
-
   def fetch_top_collections
-    collections = fetch_initial_collections
-    fetch_additional_collections(collections)
-  end
-
-  def fetch_initial_collections
     Collection
       .joins(:items, :user, :categories)
       .group('collections.id, users.id, categories.id, items.id')
       .order('COUNT(items.id) DESC')
       .limit(5)
       .includes(:user, :categories, :items)
-      .to_a
   end
 
-  def fetch_additional_collections(existing_collections)
-    while existing_collections.length < 5
-      additional_collections = Collection
-        .includes(:user, :categories, :items)
-        .limit(5 - existing_collections.length).to_a
-      break if additional_collections.empty?
+  def apply_search_filters(search_param)
+  search_params = search_param.split(',').map(&:strip)
+  search_value = "%#{search_params.first}%"
+  @collections = @collections.joins(:user, :categories)
+    .where('collections.title ILIKE ? OR users.user_name ILIKE ? OR categories.name ILIKE ?',
+           search_value, search_value, search_value)
+end
 
-      existing_collections.concat(additional_collections)
-    end
-    existing_collections
-  end
 end

@@ -47,16 +47,16 @@ CATEGORIES = [
       description: Faker::Lorem.paragraph,
       categories: [category],
       custom_fields: [
-        { id: "1", field_name: "Field 1", field_type: %w[number boolean date string text].sample },
-        { id: "2", field_name: "Field 2", field_type: %w[number boolean date string text].sample },
-        { id: "3", field_name: "Field 3", field_type: %w[number boolean date string text].sample },
-        { id: "4", field_name: "Field 4", field_type: %w[number boolean date string text].sample },
-        { id: "5", field_name: "Field 5", field_type: %w[number boolean date string text].sample },
-        { id: "6", field_name: "Field 6", field_type: %w[number boolean date string text].sample },
-        { id: "7", field_name: "Field 7", field_type: %w[number boolean date string text].sample },
-        { id: "8", field_name: "Field 8", field_type: %w[number boolean date string text].sample },
-        { id: "9", field_name: "Field 9", field_type: %w[number boolean date string text].sample },
-        { id: "10", field_name: "Field 10", field_type: %w[number boolean date string text].sample },
+        { id: "1", field_name: "Field-1", field_type: %w[number boolean date string text].sample },
+        { id: "2", field_name: "Field-2", field_type: %w[number boolean date string text].sample },
+        { id: "3", field_name: "Field-3", field_type: %w[number boolean date string text].sample },
+        { id: "4", field_name: "Field-4", field_type: %w[number boolean date string text].sample },
+        { id: "5", field_name: "Field-5", field_type: %w[number boolean date string text].sample },
+        { id: "6", field_name: "Field-6", field_type: %w[number boolean date string text].sample },
+        { id: "7", field_name: "Field-7", field_type: %w[number boolean date string text].sample },
+        { id: "8", field_name: "Field-8", field_type: %w[number boolean date string text].sample },
+        { id: "9", field_name: "Field-9", field_type: %w[number boolean date string text].sample },
+        { id: "10", field_name: "Field-10", field_type: %w[number boolean date string text].sample },
       ]
     )
   end
