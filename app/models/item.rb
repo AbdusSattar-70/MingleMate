@@ -16,7 +16,6 @@ class Item < ApplicationRecord
                   associated_against: {
                     user: [:user_name],
                     collection: %i[title description custom_fields],
-                    category: [:name],
                     tags: [:name],
                     comments: [:content]
                   },
