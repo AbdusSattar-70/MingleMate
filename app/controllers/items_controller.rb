@@ -9,7 +9,7 @@ class ItemsController < ApplicationController
   def full_text_search
     search_param = params[:search]
     @items = Item.search(search_param)
-    render json: serialize_items(@items)
+    render json: serialize_items_for_pg_search(@items)
   end
 
   def collection_items
@@ -138,6 +138,24 @@ class ItemsController < ApplicationController
       user_id: like.user_id,
       user_name: like.user&.user_name,
       user_photo: like.user&.avatar
+    }
+  end
+
+  # for pg search get rid of unused attr.
+  def serialize_items_for_pg_search(items)
+    items.map { |item| serialize_item_for_pg_search(item) }
+  end
+
+  def serialize_item_for_pg_search(item)
+    {
+      item_id: item.id,
+      item_name: item.item_name,
+      collection_name: item.collection&.title,
+      item_author: item.user&.user_name,
+      likes: item.likes.count,
+      comments: item.comments.count,
+      created_at: item.created_at,
+      updated_at: item.updated_at
     }
   end
 
