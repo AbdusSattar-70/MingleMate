@@ -1,13 +1,11 @@
 class CommentsController < ApplicationController
   before_action :set_comment, only: %i[show update destroy]
-
-  # GET /comments
-  def index
-    @comments = Comment.all
-  end
+  before_action :authenticate_user!, only: %i[create update destroy]
 
   # GET /comments/1
-  def show; end
+  def show
+    render json: serialize_comment(@comment)
+  end
 
   # POST /comments
   def create
@@ -23,15 +21,20 @@ class CommentsController < ApplicationController
   # PATCH/PUT /comments/1
   def update
     if @comment.update(comment_params)
-      render :json, status: :ok, location: @comment
+      render json: { message: 'successfully updated', data: serialize_comment(@comment) }, status: :ok
     else
-      render json: @comment.errors, status: :unprocessable_entity
+      render json: { errors: @comment.errors.full_messages }, status: :unprocessable_entity
+
     end
   end
 
   # DELETE /comments/1
   def destroy
-    @comment.destroy!
+    if @comment.destroy
+      render json: { message: 'successfully deleted', data: serialize_comment(@comment) }, status: :ok
+    else
+      render json: { errors: @comment.errors.full_messages }, status: :unprocessable_entity
+    end
   end
 
   private

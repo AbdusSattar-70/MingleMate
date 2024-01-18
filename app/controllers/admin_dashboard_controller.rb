@@ -4,7 +4,8 @@ class AdminDashboardController < ApplicationController
 
   # GET /users
   def index
-    render json: @users
+    users = @users.map { |user| serialized_user_attributes(user) }
+    render json: users
   end
 
   def block_multiple
@@ -61,5 +62,9 @@ class AdminDashboardController < ApplicationController
 
   def user_params
     params.require(:user).permit(:email, :role, :blocked, user_emails: [])
+  end
+
+  def serialized_user_attributes(resource)
+    UserSerializer.new(resource).serializable_hash[:data][:attributes]
   end
 end

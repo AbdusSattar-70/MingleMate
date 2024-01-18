@@ -1,6 +1,7 @@
 class ItemsController < ApplicationController
   before_action :set_item, only: %i[show update destroy]
   before_action :set_items, only: %i[index collection_items user_items]
+  before_action :authenticate_user!, only: %i[create update destroy]
 
   def index
     render json: serialize_items(@items)
