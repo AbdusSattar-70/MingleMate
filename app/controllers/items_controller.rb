@@ -152,9 +152,11 @@ class ItemsController < ApplicationController
       item_id: item.id,
       item_name: item.item_name,
       collection_name: item.collection&.title,
+      collection_des: item.collection&.description,
       item_author: item.user&.user_name,
-      likes: item.likes.count,
-      comments: item.comments.count,
+      likes_count: item.likes.count,
+      comments_count: item.comments.count,
+      comments_content: item.comments&.content,
       created_at: item.created_at,
       updated_at: item.updated_at
     }
