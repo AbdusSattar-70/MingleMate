@@ -148,19 +148,19 @@ class ItemsController < ApplicationController
   end
 
   def serialize_item_for_pg_search(item)
-    {
-      item_id: item.id,
-      item_name: item.item_name,
-      collection_name: item.collection&.title,
-      collection_des: item.collection&.description,
-      item_author: item.user&.user_name,
-      likes_count: item.likes.count,
-      comments_count: item.comments.count,
-      comments_content: item.comments&.content,
-      created_at: item.created_at,
-      updated_at: item.updated_at
-    }
-  end
+  {
+    item_id: item.id,
+    item_name: item.item_name,
+    collection_name: item.collection&.title,
+    collection_des: item.collection&.description,
+    item_author: item.user&.user_name,
+    likes_count: item.likes.count,
+    comments_count: item.comments.count,
+    comments_content: item.comments.map(&:content).join(', '),
+    created_at: item.created_at,
+    updated_at: item.updated_at
+  }
+end
 
   def item_params
     params.require(:item).permit(
