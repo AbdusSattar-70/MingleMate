@@ -25,6 +25,8 @@ class ItemSortingService
     end
   end
 
+  private
+
   def self.order_items_by_creation_date(items, order)
     items.order(created_at: order)
   end
@@ -32,14 +34,14 @@ class ItemSortingService
   def self.order_items_by_most_liked(items)
     items
       .joins(:likes)
-      .group('items.id')
+      .group('items.id, collections.id, users.id, tags.id, likes.id, comments.id')
       .order('COUNT(likes.id) DESC')
   end
 
   def self.order_items_by_most_commented(items)
     items
       .joins(:comments)
-      .group('items.id')
+      .group('items.id, collections.id, users.id, tags.id, likes.id, comments.id')
       .order('COUNT(comments.id) DESC')
   end
 
