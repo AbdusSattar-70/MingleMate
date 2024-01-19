@@ -15,8 +15,7 @@ class ItemsController < ApplicationController
 
   def collection_items
     sorted_request = params[:sort_by]
-    if sorted_request.present?
-      sorted_items = ItemSortingService.apply_sort_items(@items, sorted_request)
+    sorted_items = ItemSortingService.apply_sort_items(@items, sorted_request)
     render json: serialize_items(sorted_items)
   end
 
