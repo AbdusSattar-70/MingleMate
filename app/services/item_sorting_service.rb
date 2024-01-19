@@ -1,4 +1,3 @@
-# app/services/item_sorting_service.rb
 class ItemSortingService
   ASCENDING_ORDER = 'asc'.freeze
   DESCENDING_ORDER = 'desc'.freeze

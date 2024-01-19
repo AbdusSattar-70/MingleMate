@@ -10,7 +10,7 @@ class ItemsController < ApplicationController
   def full_text_search
     search_param = params[:search]
     @items = Item.search(search_param)
-    render json: serialize_items_for_pg_search(@items)
+    render json: serialize_items(@items, true) # Pass true to indicate pg_search serialization
   end
 
   def collection_items
@@ -26,7 +26,7 @@ class ItemsController < ApplicationController
   end
 
   def show
-    render json: serialize_item(@item)
+    render json: ItemSerializer.serialize(@item)
   end
 
   def create
@@ -34,7 +34,7 @@ class ItemsController < ApplicationController
     create_or_delete_item_tag(@item, params[:item][:tags])
 
     if @item.save
-      render json: @item, status: :created, location: @item
+      render json: ItemSerializer.serialize(@item), status: :created, location: @item
     else
       render json: @item.errors, status: :unprocessable_entity
     end
@@ -44,7 +44,7 @@ class ItemsController < ApplicationController
     create_or_delete_item_tag(@item, params[:item][:tags])
 
     if @item.update(item_params.except(:tags))
-      render json: @item, status: :ok, location: @item
+      render json: ItemSerializer.serialize(@item), status: :ok, location: @item
     else
       render json: @item.errors, status: :unprocessable_entity
     end
@@ -99,72 +99,8 @@ class ItemsController < ApplicationController
     %i[collection user tags likes comments]
   end
 
-  def serialize_items(items)
-    items.map { |item| serialize_item(item) }
-  end
-
-  def serialize_item(item)
-    {
-      item_id: item.id,
-      item_name: item.item_name,
-      collection_name: item.collection&.title,
-      collection_id: item.collection.id,
-      item_author: item.user&.user_name,
-      tags: item.tags.pluck(:name).flat_map { |tag| tag.split(/\s+/) },
-      item_custom_fields: item.custom_fields.map { |field| serialize_custom_field(field) },
-      likes: item.likes.map { |like| serialize_like(like) },
-      comments: item.comments.map { |comment| serialize_comment(comment) }
-    }
-  end
-
-  def serialize_custom_field(field)
-    {
-      id: field['id'],
-      field_name: field['field_name'],
-      field_type: field['field_type'],
-      field_value: field['field_value']
-    }
-  end
-
-  def serialize_comment(comment)
-    {
-      comment_id: comment.id,
-      content: comment.content,
-      commenter_name: comment.user&.user_name,
-      commenter_avatar: comment.user&.avatar,
-      commenter_id: comment.user_id,
-      created_at: comment.created_at,
-      updated_at: comment.updated_at
-    }
-  end
-
-  def serialize_like(like)
-    {
-      id: like.id,
-      user_id: like.user_id,
-      user_name: like.user&.user_name,
-      user_photo: like.user&.avatar
-    }
-  end
-
-  # for pg search get rid of unused attr.
-  def serialize_items_for_pg_search(items)
-    items.map { |item| serialize_item_for_pg_search(item) }
-  end
-
-  def serialize_item_for_pg_search(item)
-    {
-      item_id: item.id,
-      item_name: item.item_name,
-      collection_name: item.collection&.title,
-      collection_des: item.collection&.description,
-      item_author: item.user&.user_name,
-      likes_count: item.likes.count,
-      comments_count: item.comments.count,
-      comments_content: item.comments.map(&:content).join(', '),
-      created_at: item.created_at,
-      updated_at: item.updated_at
-    }
+ def serialize_items(items, for_pg_search = false)
+    items.map { |item| ItemSerializer.serialize(item, for_pg_search) }
   end
 
   def item_params
