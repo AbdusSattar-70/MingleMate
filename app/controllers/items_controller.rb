@@ -1,6 +1,6 @@
 class ItemsController < ApplicationController
   before_action :set_item, only: %i[show update destroy]
-  before_action :set_items, only: %i[index collection_items user_items sort_and_filter_items]
+  before_action :set_items, only: %i[index collection_items user_items]
   before_action :authenticate_user!, only: %i[create update destroy]
 
   def index
@@ -14,7 +14,10 @@ class ItemsController < ApplicationController
   end
 
   def collection_items
-    render json: serialize_items(@items)
+    sorted_request = params[:sort_by]
+    if sorted_request.present?
+      sorted_items = ItemSortingService.apply_sort_items(@items, sorted_request)
+    render json: serialize_items(sorted_items)
   end
 
   def user_items
@@ -76,14 +79,11 @@ class ItemsController < ApplicationController
   def set_items
     collection_id = params[:collection_id]
     user_id = params[:user_id]
-    sorted_request = params[:sort_by]
 
     @items = if collection_id.present?
-               paginate_items(Item.where(collection_id: collection_id))
+               Item.where(collection_id: collection_id)
              elsif user_id.present?
                paginate_items(Item.where(user_id: user_id))
-             elsif sorted_request.present?
-               ItemSortingService.apply_sort_items(Item.all, sorted_request)
              else
                paginate_items(Item.all)
              end
