@@ -76,23 +76,22 @@ end
     @item = Item.find(params[:id])
   end
 
-  def set_items
-    collection_id = params[:collection_id]
-    user_id = params[:user_id]
-    sorted_request = params[:sort_by]
+def set_items
+  collection_id = params[:collection_id]
+  user_id = params[:user_id]
+  sorted_request = params[:sort_by]
 
-    @items = if collection_id.present?
-               paginate_items(Item.where(collection_id:))
+  @items = if collection_id.present?
+             paginate_items(Item.where(collection_id: collection_id))
+           elsif user_id.present?
+             paginate_items(Item.where(user_id: user_id))
+           elsif sorted_request.present?
+             apply_sort_items(Item.all, sorted_request)
+           else
+             paginate_items(Item.all)
+           end
+end
 
-             elsif user_id.present?
-               paginate_items(Item.where(user_id:))
-
-              elsif sorted_request.present?
-                apply_sort_items(Item.all, sorted_request)
-             else
-               paginate_items(Item.all)
-             end
-  end
 
   def paginate_items(items)
     page = params.fetch(:page, 1).to_i
