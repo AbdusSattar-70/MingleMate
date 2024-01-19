@@ -56,16 +56,22 @@ class ItemsController < ApplicationController
 
   private
 
- def sort_items(items, sort_by)
-  case sort_by
+ def apply_sort_items(items, items_sorting)
+  case items_sorting
   when 'asc'
     items.order!(created_at: :asc)
   when 'desc'
     items.order!(created_at: :desc)
   when 'most_liked'
-    items.order!('likes_count DESC')
+    items
+      .joins('LEFT JOIN likes ON likes.item_id = items.id')
+      .group('items.id')
+      .order('COUNT(likes.id) DESC')
   when 'most_commented'
-    items.order!('comments_count DESC')
+    items
+      .joins('LEFT JOIN comments ON comments.item_id = items.id')
+      .group('items.id')
+      .order('COUNT(comments.id) DESC')
   else
     # Default to sorting by creation date in descending order
     items.order!(created_at: :desc)
@@ -108,8 +114,8 @@ end
   end
 
   def paginate_and_sort_items(items)
-  sort_by = params[:sort_by]
-  sort_items(items, sort_by) if sort_by.present?
+  items_sorting = params[:sort_by]
+  apply_sort_items(items, items_sorting) if sort_by.present?
   paginate_items(items)
 end
 
