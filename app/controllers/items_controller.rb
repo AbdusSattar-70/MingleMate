@@ -22,12 +22,7 @@ class ItemsController < ApplicationController
   end
 
   def sort_and_filter_items
-   sorted_request = params[:sort_by]
-
-  if sorted_request.present?
-    items = apply_sort_items(@items, sorted_request)
-  else
-    items = paginate_items(@items)
+    render json: serialize_items(@items)
   end
 
   render join: items
@@ -84,6 +79,7 @@ end
   def set_items
     collection_id = params[:collection_id]
     user_id = params[:user_id]
+    sorted_request = params[:sort_by]
 
     @items = if collection_id.present?
                paginate_items(Item.where(collection_id:))
@@ -91,6 +87,8 @@ end
              elsif user_id.present?
                paginate_items(Item.where(user_id:))
 
+              elsif sorted_request.present?
+                apply_sort_items(Item.all, sorted_request)
              else
                paginate_items(Item.all)
              end
