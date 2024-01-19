@@ -21,6 +21,12 @@ class ItemsController < ApplicationController
     render json: serialize_items(@items)
   end
 
+  def sort_and_filter_items
+  sorted_request = params[:sort_by]
+  apply_sort_items(@items, sorted_request) if sorted_request.present?
+  paginate_items(@items)
+end
+
   def show
     render json: serialize_item(@item)
   end
@@ -56,30 +62,6 @@ class ItemsController < ApplicationController
 
   private
 
-def apply_sort_items(items, items_sorting)
-  case items_sorting
-  when 'asc'
-    items.order(created_at: :asc)
-  when 'desc'
-    items.order(created_at: :desc)
-  when 'most_liked'
-    items
-      .joins(:likes)
-      .group('items.id')
-      .order('COUNT(likes.id) DESC')
-  when 'most_commented'
-    items
-      .joins(:comments)
-      .group('items.id')
-      .order('COUNT(comments.id) DESC')
-  else
-    # Default to sorting by creation date in descending order
-    items.order(created_at: :desc)
-  end
-end
-
-
-
   def create_or_delete_item_tag(item, tags)
     item.taggables.destroy_all
     tags = tags.strip.split(',')
@@ -94,31 +76,25 @@ end
   end
 
   def set_items
-  collection_id = params[:collection_id]
-  user_id = params[:user_id]
+    collection_id = params[:collection_id]
+    user_id = params[:user_id]
 
-  @items = if collection_id.present?
-             paginate_and_sort_items(Item.where(collection_id: collection_id))
+    @items = if collection_id.present?
+               paginate_items(Item.where(collection_id:))
 
-           elsif user_id.present?
-             paginate_and_sort_items(Item.where(user_id: user_id))
+             elsif user_id.present?
+               paginate_items(Item.where(user_id:))
 
-           else
-             paginate_and_sort_items(Item.all)
-           end
-end
+             else
+               paginate_items(Item.all)
+             end
+  end
 
   def paginate_items(items)
     page = params.fetch(:page, 1).to_i
     per_page = params.fetch(:per_page, 5).to_i
     items.includes(common_includes).order(created_at: :desc).limit(per_page).offset((page - 1) * per_page)
   end
-
-  def paginate_and_sort_items(items)
-  items_sorting = params[:sort_by]
-  apply_sort_items(items, items_sorting) if items_sorting.present?
-  paginate_items(items)
-end
 
   def common_includes
     %i[collection user tags likes comments]
@@ -191,6 +167,29 @@ end
     updated_at: item.updated_at
   }
 end
+
+def apply_sort_items(items, items_sorting)
+  case items_sorting
+  when 'asc'
+    items.order(created_at: :asc)
+  when 'desc'
+    items.order(created_at: :desc)
+  when 'most_liked'
+    items
+      .joins(:likes)
+      .group('items.id')
+      .order('COUNT(likes.id) DESC')
+  when 'most_commented'
+    items
+      .joins(:comments)
+      .group('items.id')
+      .order('COUNT(comments.id) DESC')
+  else
+    # Default to sorting by creation date in descending order
+    items.order(created_at: :desc)
+  end
+end
+
 
   def item_params
     params.require(:item).permit(

@@ -11,6 +11,7 @@ Rails.application.routes.draw do
   resources :collections
 
   get 'full_text_search', to: 'items#full_text_search'
+  get 'sort_and_filter_items', to: 'items#sort_and_filter_items'
   get 'tag_related_items', to: 'tags#tag_related_items'
   get 'top_five_collections', to: 'collections#top_five_collections'
   get 'user_collections/:id', to: 'collections#user_collections'
