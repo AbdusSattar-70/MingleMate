@@ -22,4 +22,13 @@ class Item < ApplicationRecord
                   using: {
                     tsearch: { prefix: true }
                   }
+
+# for sorting purpose
+ def likes_count
+    likes.count
+  end
+
+  def comments_count
+    comments.count
+  end
 end

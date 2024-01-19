@@ -56,21 +56,22 @@ class ItemsController < ApplicationController
 
   private
 
-  def sort_items(items, sort_by)
+ def sort_items(items, sort_by)
   case sort_by
   when 'asc'
-    items.sort_by! { |item| item.created_at }
+    items.order!(created_at: :asc)
   when 'desc'
-    items.sort_by! { |item| -item.created_at.to_i }
+    items.order!(created_at: :desc)
   when 'most_liked'
-    items.sort_by! { |item| -item.likes.count }
+    items.order!('likes_count DESC')
   when 'most_commented'
-    items.sort_by! { |item| -item.comments.count }
+    items.order!('comments_count DESC')
   else
     # Default to sorting by creation date in descending order
-    items.sort_by! { |item| -item.created_at.to_i }
+    items.order!(created_at: :desc)
   end
 end
+
 
   def create_or_delete_item_tag(item, tags)
     item.taggables.destroy_all
