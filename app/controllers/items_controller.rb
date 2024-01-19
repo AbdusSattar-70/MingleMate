@@ -83,7 +83,7 @@ class ItemsController < ApplicationController
              elsif user_id.present?
                paginate_items(Item.where(user_id: user_id))
              elsif sorted_request.present?
-               apply_sort_items(Item.all, sorted_request)
+               ItemSortingService.apply_sort_items(Item.all, sorted_request)
              else
                paginate_items(Item.all)
              end
@@ -165,28 +165,6 @@ class ItemsController < ApplicationController
       created_at: item.created_at,
       updated_at: item.updated_at
     }
-  end
-
-  def apply_sort_items(items, items_sorting)
-    case items_sorting
-    when 'asc'
-      items.order(created_at: :asc)
-    when 'desc'
-      items.order(created_at: :desc)
-    when 'most_liked'
-      items
-        .joins(:likes)
-        .group('items.id')
-        .order('COUNT(likes.id) DESC')
-    when 'most_commented'
-      items
-        .joins(:comments)
-        .group('items.id')
-        .order('COUNT(comments.id) DESC')
-    else
-      # Default to sorting by creation date in descending order
-      items.order(created_at: :desc)
-    end
   end
 
   def item_params
