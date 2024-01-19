@@ -12,7 +12,7 @@ class Collection < ApplicationRecord
   validates :categories, presence: true
 
   pg_search_scope :search_by_title_description_category_item_user,
-                  against: [:title, :description],
+                  against: %i[title description],
                   associated_against: {
                     user: [:user_name],
                     categories: [:name],

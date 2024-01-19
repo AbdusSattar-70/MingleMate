@@ -7,8 +7,6 @@ class ItemSerializer
     end
   end
 
-  private
-
   def self.serialize_regular(item)
     {
       item_id: item.id,

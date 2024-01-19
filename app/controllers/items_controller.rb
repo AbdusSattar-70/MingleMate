@@ -1,6 +1,6 @@
 class ItemsController < ApplicationController
   before_action :set_item, only: %i[show update destroy]
-  before_action :set_items, only: %i[index collection_items user_items sort_and_filter_items]
+  before_action :set_items, only: %i[index collection_items user_items]
   before_action :authenticate_user!, only: %i[create update destroy]
 
   def index
@@ -10,7 +10,8 @@ class ItemsController < ApplicationController
   def full_text_search
     search_param = params[:search]
     @items = Item.search(search_param)
-    render json: serialize_items(@items, true) # Pass true to indicate pg_search serialization
+    # Pass true to indicate pg_search serialization
+    render json: serialize_items(@items, true)
   end
 
   def collection_items
@@ -18,10 +19,6 @@ class ItemsController < ApplicationController
   end
 
   def user_items
-    render json: serialize_items(@items)
-  end
-
-  def sort_and_filter_items
     render json: serialize_items(@items)
   end
 
@@ -78,28 +75,29 @@ class ItemsController < ApplicationController
     user_id = params[:user_id]
     sorted_request = params[:sort_by]
 
-    @items = if collection_id.present?
-               paginate_items(Item.where(collection_id: collection_id))
-             elsif user_id.present?
-               paginate_items(Item.where(user_id: user_id))
-             elsif sorted_request.present?
-               ItemSortingService.apply_sort_items(Item.all, sorted_request)
-             else
-               paginate_items(Item.all)
-             end
+    items = if collection_id.present?
+              paginate_and_sort_items(Item.where(collection_id:), sorted_request)
+            elsif user_id.present?
+              paginate_and_sort_items(Item.where(user_id:), sorted_request)
+            else
+              paginate_and_sort_items(Item.all, sorted_request)
+            end
+
+    @items = items
   end
 
-  def paginate_items(items)
+  def paginate_and_sort_items(items, sorted_request = nil)
+    sorted_items = ItemSortingService.apply_sort_items(items, sorted_request)
     page = params.fetch(:page, 1).to_i
     per_page = params.fetch(:per_page, 5).to_i
-    items.includes(common_includes).order(created_at: :desc).limit(per_page).offset((page - 1) * per_page)
+    sorted_items.includes(common_includes).limit(per_page).offset((page - 1) * per_page)
   end
 
   def common_includes
     %i[collection user tags likes comments]
   end
 
- def serialize_items(items, for_pg_search = false)
+  def serialize_items(items, for_pg_search = false)
     items.map { |item| ItemSerializer.serialize(item, for_pg_search) }
   end
 

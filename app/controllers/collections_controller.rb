@@ -11,13 +11,13 @@ class CollectionsController < ApplicationController
 
     apply_search_filters(params[:search]) if params[:search].present?
 
-    if @collections.empty?
-      # If there are no matching collections, fetch the top five collections
-      @collections = fetch_top_collections
-    else
-      @collections = @collections.limit(per_page)
-                                .offset((page - 1) * per_page)
-    end
+    @collections = if @collections.empty?
+                     # If there are no matching collections, fetch the top five collections
+                     fetch_top_collections
+                   else
+                     @collections.limit(per_page)
+                       .offset((page - 1) * per_page)
+                   end
 
     render json: serialize_collections(@collections)
   end
@@ -106,16 +106,7 @@ class CollectionsController < ApplicationController
 
   def serialize_collections(collections)
     collections.map do |collection|
-      {
-        id: collection.id,
-        title: collection.title,
-        description: collection.description,
-        image: collection.image,
-        category: collection.categories.first&.name,
-        user_name: collection.user.user_name,
-        author_id: collection.user&.id,
-        items_count: collection.items.count
-      }
+      serialize_collection(collection)
     end
   end
 
@@ -153,5 +144,4 @@ class CollectionsController < ApplicationController
     search_value = "%#{search_param}%"
     @collections = Collection.search_by_title_description_category_item_user(search_value)
   end
-
 end

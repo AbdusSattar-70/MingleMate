@@ -22,6 +22,4 @@ class Item < ApplicationRecord
                   using: {
                     tsearch: { prefix: true }
                   }
-
-
 end

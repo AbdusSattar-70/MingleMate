@@ -25,8 +25,6 @@ class ItemSortingService
     end
   end
 
-  private
-
   def self.order_items_by_creation_date(items, order)
     items.order(created_at: order)
   end
