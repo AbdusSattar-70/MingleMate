@@ -56,27 +56,28 @@ class ItemsController < ApplicationController
 
   private
 
- def apply_sort_items(items, items_sorting)
+def apply_sort_items(items, items_sorting)
   case items_sorting
   when 'asc'
-    items.order!(created_at: :asc)
+    items.order(created_at: :asc)
   when 'desc'
-    items.order!(created_at: :desc)
+    items.order(created_at: :desc)
   when 'most_liked'
     items
-      .joins('LEFT JOIN likes ON likes.item_id = items.id')
+      .joins(:likes)
       .group('items.id')
       .order('COUNT(likes.id) DESC')
   when 'most_commented'
     items
-      .joins('LEFT JOIN comments ON comments.item_id = items.id')
+      .joins(:comments)
       .group('items.id')
       .order('COUNT(comments.id) DESC')
   else
     # Default to sorting by creation date in descending order
-    items.order!(created_at: :desc)
+    items.order(created_at: :desc)
   end
 end
+
 
 
   def create_or_delete_item_tag(item, tags)
