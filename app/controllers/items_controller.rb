@@ -25,9 +25,6 @@ class ItemsController < ApplicationController
     render json: serialize_items(@items)
   end
 
-  render join: items
-end
-
   def show
     render json: serialize_item(@item)
   end
@@ -76,22 +73,21 @@ end
     @item = Item.find(params[:id])
   end
 
-def set_items
-  collection_id = params[:collection_id]
-  user_id = params[:user_id]
-  sorted_request = params[:sort_by]
+  def set_items
+    collection_id = params[:collection_id]
+    user_id = params[:user_id]
+    sorted_request = params[:sort_by]
 
-  @items = if collection_id.present?
-             paginate_items(Item.where(collection_id: collection_id))
-           elsif user_id.present?
-             paginate_items(Item.where(user_id: user_id))
-           elsif sorted_request.present?
-             apply_sort_items(Item.all, sorted_request)
-           else
-             paginate_items(Item.all)
-           end
-end
-
+    @items = if collection_id.present?
+               paginate_items(Item.where(collection_id: collection_id))
+             elsif user_id.present?
+               paginate_items(Item.where(user_id: user_id))
+             elsif sorted_request.present?
+               apply_sort_items(Item.all, sorted_request)
+             else
+               paginate_items(Item.all)
+             end
+  end
 
   def paginate_items(items)
     page = params.fetch(:page, 1).to_i
@@ -157,42 +153,41 @@ end
   end
 
   def serialize_item_for_pg_search(item)
-  {
-    item_id: item.id,
-    item_name: item.item_name,
-    collection_name: item.collection&.title,
-    collection_des: item.collection&.description,
-    item_author: item.user&.user_name,
-    likes_count: item.likes.count,
-    comments_count: item.comments.count,
-    comments_content: item.comments.map(&:content).join(', '),
-    created_at: item.created_at,
-    updated_at: item.updated_at
-  }
-end
-
-def apply_sort_items(items, items_sorting)
-  case items_sorting
-  when 'asc'
-    items.order(created_at: :asc)
-  when 'desc'
-    items.order(created_at: :desc)
-  when 'most_liked'
-    items
-      .joins(:likes)
-      .group('items.id')
-      .order('COUNT(likes.id) DESC')
-  when 'most_commented'
-    items
-      .joins(:comments)
-      .group('items.id')
-      .order('COUNT(comments.id) DESC')
-  else
-    # Default to sorting by creation date in descending order
-    items.order(created_at: :desc)
+    {
+      item_id: item.id,
+      item_name: item.item_name,
+      collection_name: item.collection&.title,
+      collection_des: item.collection&.description,
+      item_author: item.user&.user_name,
+      likes_count: item.likes.count,
+      comments_count: item.comments.count,
+      comments_content: item.comments.map(&:content).join(', '),
+      created_at: item.created_at,
+      updated_at: item.updated_at
+    }
   end
-end
 
+  def apply_sort_items(items, items_sorting)
+    case items_sorting
+    when 'asc'
+      items.order(created_at: :asc)
+    when 'desc'
+      items.order(created_at: :desc)
+    when 'most_liked'
+      items
+        .joins(:likes)
+        .group('items.id')
+        .order('COUNT(likes.id) DESC')
+    when 'most_commented'
+      items
+        .joins(:comments)
+        .group('items.id')
+        .order('COUNT(comments.id) DESC')
+    else
+      # Default to sorting by creation date in descending order
+      items.order(created_at: :desc)
+    end
+  end
 
   def item_params
     params.require(:item).permit(
