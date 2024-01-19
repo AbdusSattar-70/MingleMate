@@ -56,6 +56,22 @@ class ItemsController < ApplicationController
 
   private
 
+  def sort_items(items, sort_by)
+  case sort_by
+  when 'asc'
+    items.sort_by! { |item| item.created_at }
+  when 'desc'
+    items.sort_by! { |item| -item.created_at.to_i }
+  when 'most_liked'
+    items.sort_by! { |item| -item.likes.count }
+  when 'most_commented'
+    items.sort_by! { |item| -item.comments.count }
+  else
+    # Default to sorting by creation date in descending order
+    items.sort_by! { |item| -item.created_at.to_i }
+  end
+end
+
   def create_or_delete_item_tag(item, tags)
     item.taggables.destroy_all
     tags = tags.strip.split(',')
@@ -70,25 +86,31 @@ class ItemsController < ApplicationController
   end
 
   def set_items
-    collection_id = params[:collection_id]
-    user_id = params[:user_id]
+  collection_id = params[:collection_id]
+  user_id = params[:user_id]
 
-    @items = if collection_id.present?
-               paginate_items(Item.where(collection_id:))
+  @items = if collection_id.present?
+             paginate_and_sort_items(Item.where(collection_id: collection_id))
 
-             elsif user_id.present?
-               paginate_items(Item.where(user_id:))
+           elsif user_id.present?
+             paginate_and_sort_items(Item.where(user_id: user_id))
 
-             else
-               paginate_items(Item.all)
-             end
-  end
+           else
+             paginate_and_sort_items(Item.all)
+           end
+end
 
   def paginate_items(items)
     page = params.fetch(:page, 1).to_i
     per_page = params.fetch(:per_page, 5).to_i
     items.includes(common_includes).order(created_at: :desc).limit(per_page).offset((page - 1) * per_page)
   end
+
+  def paginate_and_sort_items(items)
+  sort_by = params[:sort_by]
+  sort_items(items, sort_by) if sort_by.present?
+  paginate_items(items)
+end
 
   def common_includes
     %i[collection user tags likes comments]
