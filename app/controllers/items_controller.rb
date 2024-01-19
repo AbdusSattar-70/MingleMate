@@ -115,7 +115,7 @@ end
 
   def paginate_and_sort_items(items)
   items_sorting = params[:sort_by]
-  apply_sort_items(items, items_sorting) if sort_by.present?
+  apply_sort_items(items, items_sorting) if items_sorting.present?
   paginate_items(items)
 end
 
