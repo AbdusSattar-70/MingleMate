@@ -1,6 +1,6 @@
 class ItemsController < ApplicationController
   before_action :set_item, only: %i[show update destroy]
-  before_action :set_items, only: %i[index collection_items user_items]
+  before_action :set_items, only: %i[index collection_items user_items sort_and_filter_items]
   before_action :authenticate_user!, only: %i[create update destroy]
 
   def index
@@ -22,9 +22,15 @@ class ItemsController < ApplicationController
   end
 
   def sort_and_filter_items
-  sorted_request = params[:sort_by]
-  apply_sort_items(@items, sorted_request) if sorted_request.present?
-  paginate_items(@items)
+   sorted_request = params[:sort_by]
+
+  if sorted_request.present?
+    items = apply_sort_items(@items, sorted_request)
+  else
+    items = paginate_items(@items)
+  end
+
+  render join: items
 end
 
   def show
