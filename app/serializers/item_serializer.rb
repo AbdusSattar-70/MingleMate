@@ -14,11 +14,12 @@ class ItemSerializer
       item_id: item.id,
       item_name: item.item_name,
       collection_name: item.collection&.title,
-      collection_id: item.collection.id,
+      collection_id: item.collection&.id,
       item_author: item.user&.user_name,
-      tags: serialize_tags(item.tags),
+      author_id: item.user&.id,
+      tags: serialize_tags(item&.tags),
       item_custom_fields: serialize_custom_fields(item.custom_fields),
-      likes: serialize_likes(item.likes),
+      likes: serialize_likes(item&.likes),
       comments: serialize_comments(item.comments)
     }
   end
