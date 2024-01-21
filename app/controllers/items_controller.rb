@@ -75,14 +75,14 @@ class ItemsController < ApplicationController
   def set_items
     collection_id = params[:collection_id]
     user_id = params[:user_id]
-    
+
     @items = if collection_id.present?
-               Item.where(collection_id: collection_id)
+               Item.where(collection_id:)
              elsif user_id.present?
-               paginate_items(Item.where(user_id: user_id))
+               paginate_items(Item.where(user_id:))
              else
                paginate_items(Item.all)
-  end
+             end
   end
 
   def paginate_and_sort_items(items, sorted_request = nil)
