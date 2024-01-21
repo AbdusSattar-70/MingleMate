@@ -106,16 +106,7 @@ class CollectionsController < ApplicationController
 
   def serialize_collections(collections)
     collections.map do |collection|
-      {
-        id: collection.id,
-        title: collection.title,
-        description: collection.description,
-        image: collection.image,
-        category: collection.categories.first&.name,
-        user_name: collection.user.user_name,
-        author_id: collection.user&.id,
-        items_count: collection.items.count
-      }
+      serialize_collection(collection)
     end
   end
 
