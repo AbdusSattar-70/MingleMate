@@ -15,7 +15,9 @@ class ItemsController < ApplicationController
   end
 
   def collection_items
-    render json: serialize_items(@items)
+    sorted_request = params[:sort_by]
+    sorted_items = ItemSortingService.apply_sort_items(@items, sorted_request)
+    render json: serialize_items(sorted_items)
   end
 
   def user_items
@@ -73,17 +75,14 @@ class ItemsController < ApplicationController
   def set_items
     collection_id = params[:collection_id]
     user_id = params[:user_id]
-    sorted_request = params[:sort_by]
 
-    items = if collection_id.present?
-              paginate_and_sort_items(Item.where(collection_id:), sorted_request)
-            elsif user_id.present?
-              paginate_and_sort_items(Item.where(user_id:), sorted_request)
-            else
-              paginate_and_sort_items(Item.all, sorted_request)
-            end
-
-    @items = items
+    @items = if collection_id.present?
+               Item.where(collection_id:)
+             elsif user_id.present?
+               paginate_items(Item.where(user_id:))
+             else
+               paginate_items(Item.all)
+             end
   end
 
   def paginate_and_sort_items(items, sorted_request = nil)
