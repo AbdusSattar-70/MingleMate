@@ -152,6 +152,9 @@ GEM
     orm_adapter (0.5.0)
     pg (1.5.4)
     pg (1.5.4-x64-mingw-ucrt)
+    pg_search (2.3.6)
+      activerecord (>= 5.2)
+      activesupport (>= 5.2)
     psych (5.1.2)
       stringio
     puma (6.4.0)
@@ -237,6 +240,7 @@ DEPENDENCIES
   faker
   jsonapi-serializer
   pg (~> 1.1)
+  pg_search
   puma (>= 5.0)
   rack-cors
   rails (~> 7.1.2)

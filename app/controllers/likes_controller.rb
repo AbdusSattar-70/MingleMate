@@ -1,4 +1,6 @@
 class LikesController < ApplicationController
+  before_action :authenticate_user!, only: %i[create]
+
   # GET /item_likes_count/:item_id
   def item_likes_count
     item_id = params[:item_id]
