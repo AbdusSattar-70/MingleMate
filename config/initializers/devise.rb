@@ -49,8 +49,7 @@ Devise.setup do |config|
   jwt.revocation_requests = [
     ['DELETE', %r{^/sign_out$}]
   ]
-  # if you set the time you have to make a way to again signin to user as user doesn't leave the page with specified time.
-  # jwt.expiration_time = 5.minutes.to_i
+  jwt.expiration_time = 50.minutes.to_i
 end
 
   # The default HTTP method used to sign out a resource. Default is :delete.
