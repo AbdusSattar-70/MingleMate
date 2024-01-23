@@ -52,6 +52,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_01_10_203246) do
 
   create_table "items", force: :cascade do |t|
     t.string "item_name"
+    t.string "item_image"
     t.jsonb "custom_fields"
     t.bigint "user_id", null: false
     t.bigint "collection_id", null: false

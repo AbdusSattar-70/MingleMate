@@ -11,6 +11,7 @@ class ItemSerializer
     {
       item_id: item.id,
       item_name: item.item_name,
+      item_image: item.item_image,
       collection_name: item.collection&.title,
       collection_id: item.collection&.id,
       item_author: item.user&.user_name,
