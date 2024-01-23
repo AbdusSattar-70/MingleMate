@@ -53,7 +53,7 @@ class AdminDashboardController < ApplicationController
     end
   end
 
-   def handle_role_action(new_role, success_message, failure_message)
+  def handle_role_action(new_role, success_message, failure_message)
     user_emails = params[:user_emails]
     users = User.where(email: user_emails)
 
