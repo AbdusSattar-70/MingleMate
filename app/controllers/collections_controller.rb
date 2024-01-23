@@ -2,16 +2,15 @@ class CollectionsController < ApplicationController
   before_action :set_collection, only: %i[show update destroy]
   before_action :authenticate_user!, only: %i[create update destroy]
 
- # GET /collections
-def index
-  if params[:search].present?
-    render json: serialize_collections(apply_search_filters(params[:search]))
-  else
-    @collections = paginate_collections(Collection.includes(:user, :categories))
-    render json: serialize_collections(@collections)
+  # GET /collections
+  def index
+    if params[:search].present?
+      render json: serialize_collections(apply_search_filters(params[:search]))
+    else
+      @collections = paginate_collections(Collection.includes(:user, :categories))
+      render json: serialize_collections(@collections)
+    end
   end
-end
-
 
   # GET /collections/top_five
   def top_five_collections
@@ -129,10 +128,9 @@ end
     @collections = Collection.search_by_title_description_category_item_user(search_value)
   end
 
-   def paginate_collections(collections)
+  def paginate_collections(collections)
     page = params.fetch(:page, 1).to_i
     per_page = params.fetch(:per_page, 5).to_i
     collections.limit(per_page).offset((page - 1) * per_page)
   end
-
 end
