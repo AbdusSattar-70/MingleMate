@@ -102,6 +102,7 @@ class ItemsController < ApplicationController
   def item_params
     params.require(:item).permit(
       :item_name,
+      :item_image,
       :collection_id,
       :user_id,
       :tags,
