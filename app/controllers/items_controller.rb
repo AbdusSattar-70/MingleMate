@@ -88,7 +88,7 @@ class ItemsController < ApplicationController
   def paginate_items(items)
     page = params.fetch(:page, 1).to_i
     per_page = params.fetch(:per_page, 5).to_i
-    items.includes(common_includes).limit(per_page).offset((page - 1) * per_page)
+    items.includes(common_includes).order('created_at DESC').limit(per_page).offset((page - 1) * per_page)
   end
 
   def common_includes
