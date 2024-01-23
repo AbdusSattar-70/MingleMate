@@ -85,11 +85,10 @@ class ItemsController < ApplicationController
              end
   end
 
-  def paginate_and_sort_items(items, sorted_request = nil)
-    sorted_items = ItemSortingService.apply_sort_items(items, sorted_request)
+  def paginate_items(items)
     page = params.fetch(:page, 1).to_i
     per_page = params.fetch(:per_page, 5).to_i
-    sorted_items.includes(common_includes).limit(per_page).offset((page - 1) * per_page)
+    items.includes(common_includes).limit(per_page).offset((page - 1) * per_page)
   end
 
   def common_includes

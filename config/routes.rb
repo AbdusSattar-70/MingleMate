@@ -33,7 +33,8 @@ Rails.application.routes.draw do
   get 'admin/users', to: 'admin_dashboard#index'
   patch 'admin/users/block', to: 'admin_dashboard#block_multiple'
   patch 'admin/users/unblock', to: 'admin_dashboard#unblock_multiple'
-  patch 'admin/users/role_toggle', to: 'admin_dashboard#toggle_role'
+  patch 'admin/users/assign_admin_role_multiple', to: 'admin_dashboard#assign_admin_role_multiple'
+  patch 'admin/users/remove_from_admin_multiple', to: 'admin_dashboard#remove_from_admin_multiple'
   delete 'admin/users/delete', to: 'admin_dashboard#destroy_multiple'
   get "up" => "rails/health#show", as: :rails_health_check
   end
