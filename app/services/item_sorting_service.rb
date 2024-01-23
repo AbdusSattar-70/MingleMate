@@ -32,14 +32,14 @@ class ItemSortingService
   def self.order_items_by_most_liked(items)
     items
       .joins(:likes)
-      .group('items.id, collections.id, users.id, tags.id, likes.id, comments.id')
+      .group('items.id, likes.id')
       .order('COUNT(likes.id) DESC')
   end
 
   def self.order_items_by_most_commented(items)
     items
       .joins(:comments)
-      .group('items.id, collections.id, users.id, tags.id, likes.id, comments.id')
+      .group('items.id, comments.id')
       .order('COUNT(comments.id) DESC')
   end
 

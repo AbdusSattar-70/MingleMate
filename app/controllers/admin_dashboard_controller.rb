@@ -20,15 +20,12 @@ class AdminDashboardController < ApplicationController
     handle_multiple_action(nil, 'Delete succeeded', 'Failed to delete')
   end
 
-  def toggle_role
-    user_emails = params[:user_emails]
-    users = User.where(email: user_emails)
+  def assign_admin_role_multiple
+    handle_role_action(2, 'Admin role assigned successfully', 'Failed to assign admin role')
+  end
 
-    users.each do |user|
-      user.update(role: toggle_role_value(user.role))
-    end
-
-    render json: { message: 'Role toggled successfully' }, status: :ok
+  def remove_from_admin_multiple
+    handle_role_action(1, 'Removed from admin role successfully', 'Failed to remove from admin role')
   end
 
   private
@@ -56,8 +53,15 @@ class AdminDashboardController < ApplicationController
     end
   end
 
-  def toggle_role_value(current_role)
-    current_role == 1 ? 2 : 1
+   def handle_role_action(new_role, success_message, failure_message)
+    user_emails = params[:user_emails]
+    users = User.where(email: user_emails)
+
+    if users.update_all(role: new_role)
+      render json: { message: success_message }, status: :ok
+    else
+      render json: { message: failure_message }, status: :unprocessable_entity
+    end
   end
 
   def user_params
