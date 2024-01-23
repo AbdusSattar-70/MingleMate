@@ -1,6 +1,6 @@
 class ItemSortingService
-  ASCENDING_ORDER = 'asc'.freeze
-  DESCENDING_ORDER = 'desc'.freeze
+  ASCENDING_ORDER = 'ASC'.freeze
+  DESCENDING_ORDER = 'DESC'.freeze
   MOST_LIKED = 'most_liked'.freeze
   MOST_COMMENTED = 'most_commented'.freeze
   NO_LIKES = 'no_likes'.freeze
@@ -9,9 +9,9 @@ class ItemSortingService
   def self.apply_sort_items(items, items_sorting)
     case items_sorting
     when ASCENDING_ORDER
-      order_items_by_creation_date(items, :asc)
+      order_items_by_creation_date(items, ASCENDING_ORDER)
     when DESCENDING_ORDER
-      order_items_by_creation_date(items, :desc)
+      order_items_by_creation_date(items, DESCENDING_ORDER)
     when MOST_LIKED
       order_items_by_most_liked(items)
     when MOST_COMMENTED
@@ -47,17 +47,17 @@ class ItemSortingService
     items
       .left_outer_joins(:likes)
       .where(likes: { id: nil })
-      .order(created_at: :desc)
+      .order(created_at: DESCENDING_ORDER)
   end
 
   def self.items_with_no_comments(items)
     items
       .left_outer_joins(:comments)
       .where(comments: { id: nil })
-      .order(created_at: :desc)
+      .order(created_at: DESCENDING_ORDER)
   end
 
   def self.default_sort_order(items)
-    order_items_by_creation_date(items, :desc)
+    order_items_by_creation_date(items, DESCENDING_ORDER)
   end
 end

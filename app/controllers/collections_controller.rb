@@ -118,7 +118,7 @@ class CollectionsController < ApplicationController
   def fetch_top_collections
     Collection
       .joins(:items)
-      .group('collections.id, items.id')
+      .group('collections.id')
       .order('COUNT(items.id) DESC')
       .limit(5)
   end
