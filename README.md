@@ -1,5 +1,6 @@
 # README
 ## Client apps link: https://github.com/AbdusSattar-70/MingleMate_client
+## Full API documentation will be coming soon.
 This README would normally document whatever steps are necessary to get the
 application up and running.
 
