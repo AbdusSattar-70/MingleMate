@@ -1,6 +1,6 @@
 class ItemSortingService
-  ASCENDING_ORDER = 'ASC'.freeze
-  DESCENDING_ORDER = 'DESC'.freeze
+  ASCENDING_ORDER = 'asc'.freeze
+  DESCENDING_ORDER = 'desc'.freeze
   MOST_LIKED = 'most_liked'.freeze
   MOST_COMMENTED = 'most_commented'.freeze
   NO_LIKES = 'no_likes'.freeze
@@ -30,18 +30,18 @@ class ItemSortingService
   end
 
   def self.order_items_by_most_liked(items)
-  items
-    .left_joins(:likes)
-    .group('items.id')
-    .order('COUNT(DISTINCT likes.id) DESC')
-end
+    items
+      .left_joins(:likes)
+      .group('items.id')
+      .order('COUNT(likes.id) DESC')
+  end
 
-def self.order_items_by_most_commented(items)
-  items
-    .left_joins(:comments)
-    .group('items.id')
-    .order('COUNT(DISTINCT comments.id) DESC')
-end
+  def self.order_items_by_most_commented(items)
+    items
+      .left_joins(:comments)
+      .group('items.id')
+      .order('COUNT(comments.id) DESC')
+  end
 
   def self.items_with_no_likes(items)
     items
