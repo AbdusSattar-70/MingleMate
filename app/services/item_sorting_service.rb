@@ -30,18 +30,18 @@ class ItemSortingService
   end
 
   def self.order_items_by_most_liked(items)
-    items
-      .joins(:likes)
-      .group('items.id, likes.id')
-      .order('COUNT(likes.id) DESC')
-  end
+  items
+    .left_joins(:likes)
+    .group('items.id')
+    .order('COUNT(DISTINCT likes.id) DESC')
+end
 
-  def self.order_items_by_most_commented(items)
-    items
-      .joins(:comments)
-      .group('items.id, comments.id')
-      .order('COUNT(comments.id) DESC')
-  end
+def self.order_items_by_most_commented(items)
+  items
+    .left_joins(:comments)
+    .group('items.id')
+    .order('COUNT(DISTINCT comments.id) DESC')
+end
 
   def self.items_with_no_likes(items)
     items
