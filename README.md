@@ -30,3 +30,4 @@ Things you may want to cover:
 - add gem `sidekiq`
 - add gem `redis`
 - run `EDITOR="code --wait" bin/rails credentials:edit --environment=production` for generating production-key
+- add environment variable
