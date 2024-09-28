@@ -11,7 +11,9 @@ gem 'puma', '>= 5.0'
 gem 'rack-cors'
 gem 'rails', '~> 7.1.2'
 gem 'redis'
+
 gem "sidekiq", "~> 7.3"
+
 gem 'tzinfo-data', platforms: %i[windows jruby]
 
 
