@@ -25,7 +25,7 @@ Things you may want to cover:
 
 - Deployment instructions
 
-# AWS setup for deployment:
+## AWS setup for deployment:
 
 - add gem `sidekiq`
 - add gem `redis`
