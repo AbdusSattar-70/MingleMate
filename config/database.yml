@@ -1,8 +1,9 @@
 default: &default
   adapter: postgresql
   encoding: unicode
-  username: sattar
-  password: sattar
+  host: host.docker.internal
+  username: postgres
+  password: postgres
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
 
 development:
@@ -15,6 +16,5 @@ test:
 
 production:
   <<: *default
-  database: mingle_hvmn
-  username: sattar
-  password: <%= ENV["DATABASE_URL"] %>
+  url: <%= ENV["DATABASE_URL"] %>
+

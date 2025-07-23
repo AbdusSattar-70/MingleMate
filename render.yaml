@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: minglemate-api
+    env: ruby
+    plan: free
+    buildCommand: bundle install && bundle exec bootsnap precompile app/ lib/
+    startCommand: bundle exec rails server -b 0.0.0.0 -p 3000
+    envVars:
+      - key: RAILS_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false
+      - key: SECRET_KEY_BASE
+        generateValue: true
